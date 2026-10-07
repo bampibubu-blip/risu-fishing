@@ -1,0 +1,2050 @@
+{
+ "version": 1,
+ "name": "리스 낚시터 물고기",
+ "presets": {},
+ "inpaints": {},
+ "scenes": {
+  "fantasy_01": {
+   "type": "scene",
+   "name": "fantasy_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, minnow, faint blue glow, magic sparkles",
+      "id": "05b91381-110b-450b-9d06-98a41a771469",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_02": {
+   "type": "scene",
+   "name": "fantasy_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "frog, green frog, tiny gold crown",
+      "id": "31487736-16f0-455a-be17-7976a89aebb8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_03": {
+   "type": "scene",
+   "name": "fantasy_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, silver scales, shiny",
+      "id": "31404d2c-1971-49ba-a13d-5d238802f679",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_04": {
+   "type": "scene",
+   "name": "fantasy_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "mushroom, red cap, white spots, floating",
+      "id": "d419bd66-8a6a-48b9-bb60-77a482d0ee97",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_05": {
+   "type": "scene",
+   "name": "fantasy_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "wet parchment, scroll, notice paper, wax seal",
+      "id": "24ab37b0-fd21-4db6-81a9-0a40bbde80a7",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_06": {
+   "type": "scene",
+   "name": "fantasy_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "rusty sword, short sword, chipped blade",
+      "id": "ee11963e-f28b-41ed-a3e2-9eee8c0cc115",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_07": {
+   "type": "scene",
+   "name": "fantasy_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "carp, long pointy elf ears, blush",
+      "id": "5d8546c1-57b3-41eb-bef8-37fb0416acd3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_08": {
+   "type": "scene",
+   "name": "fantasy_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crab, shield-shaped shell, heraldic crest",
+      "id": "8e3384ac-07e5-4d26-b440-0f7660ace399",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_09": {
+   "type": "scene",
+   "name": "fantasy_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, potion bottle shape, cork, pink liquid",
+      "id": "028122e4-ad7f-4af5-b141-1906d29651ce",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_10": {
+   "type": "scene",
+   "name": "fantasy_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "eel, purple eel, gem on head, wizard staff",
+      "id": "3be8aa47-53d4-446f-8bbb-8ee5bbac7dad",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_11": {
+   "type": "scene",
+   "name": "fantasy_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "carp, baby dragon, dragon scales, small horns, tiny flame, subtle glow",
+      "id": "4312617d-f555-435f-9a91-65cb16c53e95",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_12": {
+   "type": "scene",
+   "name": "fantasy_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "squid, small horned helmet, dark armor, holding scroll, subtle glow",
+      "id": "ec19569c-31da-4e05-836c-9a1a715691e5",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_13": {
+   "type": "scene",
+   "name": "fantasy_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "comb, seashell comb, pearl, strand of hair, subtle glow",
+      "id": "9a9ae674-2568-410f-8c93-ca232f031e57",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_14": {
+   "type": "scene",
+   "name": "fantasy_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "catfish, large catfish, halo, golden axe, silver axe, serene, soft glow, sparkles",
+      "id": "0cd6e93b-67b8-483f-9e72-0c39e5ca8475",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "fantasy_15": {
+   "type": "scene",
+   "name": "fantasy_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, holy sword stuck in back, glowing sword, soft glow, sparkles",
+      "id": "d28d8219-ab03-4259-9df6-24444fb19a4f",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_01": {
+   "type": "scene",
+   "name": "city_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, tired, eye bags, necktie",
+      "id": "9fa1a6d3-b134-4242-9733-636f08bb8840",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_02": {
+   "type": "scene",
+   "name": "city_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "mullet, gray fish, dark circles under eyes, coffee cup",
+      "id": "a0e2641c-4c63-48db-a001-9e7053a9f3c1",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_03": {
+   "type": "scene",
+   "name": "city_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "snail, river snail, neon pink and cyan shell",
+      "id": "e46f7e22-b36f-42f8-8718-28e93e8b5bf3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_04": {
+   "type": "scene",
+   "name": "city_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "plastic bag, white plastic bag, crumpled, receipt sticking out",
+      "id": "5677a7a7-fded-416d-bd53-84047306e4e2",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_05": {
+   "type": "scene",
+   "name": "city_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "can, canned coffee, dented",
+      "id": "b4ecabe0-3d70-4df2-8cd9-f63aee9e93d7",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_06": {
+   "type": "scene",
+   "name": "city_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "id card, employee badge, blue lanyard",
+      "id": "e3be1279-4416-44d4-837d-af079006fd89",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_07": {
+   "type": "scene",
+   "name": "city_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, coffee brown, latte art heart pattern",
+      "id": "2424a677-0ed7-45ec-8580-78aada7da6ad",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_08": {
+   "type": "scene",
+   "name": "city_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "salmon, jumping, holding briefcase",
+      "id": "54c0e65b-2f03-463d-8ad1-57f2b6c41ba5",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_09": {
+   "type": "scene",
+   "name": "city_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "turtle, cardboard box on shell, shipping label",
+      "id": "a9a168e9-da11-4445-b3e9-ea194b485f2b",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_10": {
+   "type": "scene",
+   "name": "city_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "bicycle wheel, green frame piece, spokes",
+      "id": "cdecbdee-1503-45b6-8fae-f5a76cd89022",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_11": {
+   "type": "scene",
+   "name": "city_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, half deflated, coins falling, subtle glow",
+      "id": "53b68775-8119-4145-b702-5f5e7aee335d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_12": {
+   "type": "scene",
+   "name": "city_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "jellyfish, light stick body, rainbow glow, subtle glow",
+      "id": "feea8fac-df36-436a-adac-727c69ab060f",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_13": {
+   "type": "scene",
+   "name": "city_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "shark, business suit, sunglasses, gold watch, subtle glow",
+      "id": "0cdab64d-e686-43b3-8a6a-da1d07758e5c",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_14": {
+   "type": "scene",
+   "name": "city_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "giant carp, river monster, mysterious, ripples, soft glow, sparkles",
+      "id": "5d66e5d5-1b29-4834-b306-dcfe64ad6650",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "city_15": {
+   "type": "scene",
+   "name": "city_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, gold, sparkles, lottery ticket, soft glow, sparkles",
+      "id": "66de0801-80c4-49f3-a37b-9ff71e056386",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_01": {
+   "type": "scene",
+   "name": "school_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, toast in mouth, running, sweat drop",
+      "id": "f6d49c83-a687-4a96-85e1-34910958b653",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_02": {
+   "type": "scene",
+   "name": "school_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, sweet bun shape, bread texture",
+      "id": "4f48ff11-a5ef-4ead-be21-84829cafd10b",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_03": {
+   "type": "scene",
+   "name": "school_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "frog, safety goggles, relieved",
+      "id": "b6dc721a-907a-4dd8-8325-883c3c06f21c",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_04": {
+   "type": "scene",
+   "name": "school_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "swimming cap, blue swim cap, name patch",
+      "id": "71593cda-5c00-4910-b381-15c6394b1817",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_05": {
+   "type": "scene",
+   "name": "school_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "test paper, crumpled, red x marks",
+      "id": "701ba6ae-211a-425b-bcea-2891cddfe824",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_06": {
+   "type": "scene",
+   "name": "school_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "indoor shoe, white school slipper, heel crushed",
+      "id": "63636fc6-b2e9-4931-951e-66d9da487c0d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_07": {
+   "type": "scene",
+   "name": "school_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "tropical fish, armband, clipboard",
+      "id": "5da8280a-19c0-4a8b-9815-bb78195cda63",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_08": {
+   "type": "scene",
+   "name": "school_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "mackerel, gym tracksuit",
+      "id": "d028ea0e-dd9d-4f07-a96e-61fad596e729",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_09": {
+   "type": "scene",
+   "name": "school_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "duck, holding flyer, eager",
+      "id": "c62387ee-07f2-48a3-a0ee-395e638c3206",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_10": {
+   "type": "scene",
+   "name": "school_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "envelope, pink envelope, heart sticker, damp",
+      "id": "b7bdb337-d897-4813-98ce-cd1f23334e23",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_11": {
+   "type": "scene",
+   "name": "school_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, pajamas, hugging pillow, subtle glow",
+      "id": "e1391776-8ec6-415a-8d76-f936313d273e",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_12": {
+   "type": "scene",
+   "name": "school_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "carp, blushing, nervous, holding letter, subtle glow",
+      "id": "648547e2-63a2-4b98-972b-ee06cb1f6d83",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_13": {
+   "type": "scene",
+   "name": "school_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "shark, glasses, armband, strict, subtle glow",
+      "id": "ad45711f-f889-4a7e-8e2e-fa37fd79ee15",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_14": {
+   "type": "scene",
+   "name": "school_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "whale, podium, microphone, speech, soft glow, sparkles",
+      "id": "fa1f9edf-c235-40fd-a7ac-462b235f62b7",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "school_15": {
+   "type": "scene",
+   "name": "school_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, graduation cap, rolled diploma, soft glow, sparkles",
+      "id": "36d67429-67c3-4df1-9399-e35257b5f554",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_01": {
+   "type": "scene",
+   "name": "space_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "plankton, cluster, stardust, tiny sparkles",
+      "id": "00a918d7-2087-4894-b264-46916cacedf6",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_02": {
+   "type": "scene",
+   "name": "space_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "sardine, tiny planet, orbit ring",
+      "id": "5178456f-3bf8-48a8-8c0b-584fab4cfbac",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_03": {
+   "type": "scene",
+   "name": "space_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "anchovy, upside down, floating, small bubbles",
+      "id": "4cc8a639-e893-416d-8efa-bcade6190087",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_04": {
+   "type": "scene",
+   "name": "space_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "screw, metal bolt",
+      "id": "a04ea64a-5f73-40f6-8074-ef4c8732a2e4",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_05": {
+   "type": "scene",
+   "name": "space_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "satellite debris, broken solar panel",
+      "id": "2a41f783-b6ce-42d1-8f92-d4f7776d8aa8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_06": {
+   "type": "scene",
+   "name": "space_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "squeeze tube, space food tube",
+      "id": "b4e10682-7322-4edb-b729-0b5535cae6fc",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_07": {
+   "type": "scene",
+   "name": "space_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "tropical fish, hologram, translucent cyan, glitch lines",
+      "id": "128cadac-183f-4a87-8a3e-8d89d3e8318d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_08": {
+   "type": "scene",
+   "name": "space_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crayfish, robot, metal plates, antenna",
+      "id": "9fd195cc-01b6-4038-86e5-eeda82448cf1",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_09": {
+   "type": "scene",
+   "name": "space_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "octopus, alien, green, waving tentacle",
+      "id": "6669dae1-5b14-4e95-949d-eb0ed041fe0d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_10": {
+   "type": "scene",
+   "name": "space_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "flying fish, meteor, fiery trail",
+      "id": "58cc05c4-9302-4c93-9f8c-47c8cfbe4697",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_11": {
+   "type": "scene",
+   "name": "space_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "squid, dark purple, black hole swirl on body, subtle glow",
+      "id": "7d7bcb16-bbd7-4369-9d14-ba1c6c40c4db",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_12": {
+   "type": "scene",
+   "name": "space_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, supernova, bright orange glow, subtle glow",
+      "id": "2f945c6a-7e1c-4ece-92e1-085ba342029c",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_13": {
+   "type": "scene",
+   "name": "space_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "flatfish, flying saucer shape, small lights, subtle glow",
+      "id": "a8536260-79e9-46e3-8725-af6bd285a425",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_14": {
+   "type": "scene",
+   "name": "space_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "whale, galaxy pattern body, stars, constellation lines, soft glow, sparkles",
+      "id": "8966192e-d803-4ed0-8c9b-c2d3e2e67610",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "space_15": {
+   "type": "scene",
+   "name": "space_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, warped space, distortion, prism colors, soft glow, sparkles",
+      "id": "9113403d-9012-4d63-b2d0-ce7f47a36e5f",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_01": {
+   "type": "scene",
+   "name": "murim_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, headband, cloth bundle, sneaking",
+      "id": "d457b39c-3c61-4118-ac9c-f744f296203d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_02": {
+   "type": "scene",
+   "name": "murim_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, bamboo pattern, green",
+      "id": "87bf9899-47db-42be-90dd-d79728e2ac71",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_03": {
+   "type": "scene",
+   "name": "murim_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "frog, leaping, wind swirls",
+      "id": "abfa77b5-c9c0-493d-8e96-89c1eb797d05",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_04": {
+   "type": "scene",
+   "name": "murim_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "old book, torn pages, ancient manual",
+      "id": "5ad40080-cf11-4806-b4e8-92b80d46a2d3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_05": {
+   "type": "scene",
+   "name": "murim_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "chopstick, single wooden chopstick",
+      "id": "1e0118bf-5cfc-45b0-9dd6-67cc3e92725a",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_06": {
+   "type": "scene",
+   "name": "murim_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "teacup, celadon cup",
+      "id": "4b806adc-b268-4f6d-a215-82c3ce79296d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_07": {
+   "type": "scene",
+   "name": "murim_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "carp, swirling aura, water splash",
+      "id": "80cc3793-7a6c-4423-9abe-d3e801febd53",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_08": {
+   "type": "scene",
+   "name": "murim_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crab, iron shell, metallic",
+      "id": "7e6569c0-875a-4b83-9438-0f5581d5905e",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_09": {
+   "type": "scene",
+   "name": "murim_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "catfish, glowing red eyes, red aura, angry",
+      "id": "8e0caaf0-5c2f-4280-86b3-1adecc0da7a5",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_10": {
+   "type": "scene",
+   "name": "murim_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "turtle, long white beard, meditating",
+      "id": "7ca155f8-fdff-4dad-9dba-699f5fa11210",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_11": {
+   "type": "scene",
+   "name": "murim_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "eel, serpent, small horns, almost dragon, subtle glow",
+      "id": "b4b33534-9107-490f-bcf3-dc210d900b70",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_12": {
+   "type": "scene",
+   "name": "murim_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "saury, long silver fish, sword-like, subtle glow",
+      "id": "ee5f9831-5e49-4a40-9100-357345ffef98",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_13": {
+   "type": "scene",
+   "name": "murim_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, nine tails, fox-like fan tails, subtle glow",
+      "id": "1fc044a9-50fb-4ba2-b5e0-277240b87a54",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_14": {
+   "type": "scene",
+   "name": "murim_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "golden carp, waterfall, leaping, dragon whiskers, soft glow, sparkles",
+      "id": "0b4acfee-995f-42ef-8af0-d993a314f840",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "murim_15": {
+   "type": "scene",
+   "name": "murim_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, jade seal in mouth, soft glow, sparkles",
+      "id": "c8725572-61d7-4887-8459-5e76d9716c9e",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_01": {
+   "type": "scene",
+   "name": "deep_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "sardine, pale, no eyes",
+      "id": "3abbef4d-a731-42f7-9d2a-3e6611a738b8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_02": {
+   "type": "scene",
+   "name": "deep_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "baby anglerfish, tiny glowing lure",
+      "id": "b12e9146-7c31-4120-9d34-b547cbeaf0e3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_03": {
+   "type": "scene",
+   "name": "deep_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "shrimp, transparent body",
+      "id": "264d0e2b-9a11-420a-9c9d-b977fcf673c5",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_04": {
+   "type": "scene",
+   "name": "deep_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "conch shell, spiral shell, empty",
+      "id": "b8db4e8c-6ee4-48ea-a229-5f8054147359",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_05": {
+   "type": "scene",
+   "name": "deep_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "coral, broken pink coral branch",
+      "id": "51520863-fbf4-46d9-a292-a33b52d60db8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_06": {
+   "type": "scene",
+   "name": "deep_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "eyepatch, black pirate eyepatch, skull mark",
+      "id": "ed77529e-8578-49a0-89f3-89d041afca71",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_07": {
+   "type": "scene",
+   "name": "deep_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "anglerfish, paper lantern lure, warm light",
+      "id": "110f7d2b-5e47-41ed-bcbb-9cf9988f0107",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_08": {
+   "type": "scene",
+   "name": "deep_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "spider crab, very long legs",
+      "id": "252f661a-270b-4ab3-b84f-2b33296a8fa8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_09": {
+   "type": "scene",
+   "name": "deep_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "octopus, holding treasure map",
+      "id": "a81d17d1-fe3a-45c7-9527-06f4d78e9a2f",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_10": {
+   "type": "scene",
+   "name": "deep_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "cod, captain hat, barnacles",
+      "id": "46edbef4-c94e-44f0-8f98-892edf26103d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_11": {
+   "type": "scene",
+   "name": "deep_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "giant squid, red, long tentacles, subtle glow",
+      "id": "f16c14e8-94b5-46d5-940a-b65b6f999870",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_12": {
+   "type": "scene",
+   "name": "deep_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "eel, golden trident tail, subtle glow",
+      "id": "d3e026b5-ce27-464d-bbc7-0fbc387b0650",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_13": {
+   "type": "scene",
+   "name": "deep_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crab, treasure chest shell, gold coins, sand, subtle glow",
+      "id": "d8810ae7-c001-4081-9e9d-d5724cd57b63",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_14": {
+   "type": "scene",
+   "name": "deep_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "kraken, giant octopus, gripping small ship, soft glow, sparkles",
+      "id": "fe0fc97f-912c-46e0-9de2-f3303bc068f1",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "deep_15": {
+   "type": "scene",
+   "name": "deep_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "jellyfish, bioluminescent, iridescent, soft glow, sparkles",
+      "id": "d481848c-c093-46e8-9c96-49b49f75e0e3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_01": {
+   "type": "scene",
+   "name": "ruin_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, zombie, stitches, pale green",
+      "id": "9207b03a-302a-4a1e-9d1c-ca791b28cdc7",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_02": {
+   "type": "scene",
+   "name": "ruin_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "loach, glowing green",
+      "id": "9da4bff5-0f51-4a76-b2ea-b9afdcd9afa8",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_03": {
+   "type": "scene",
+   "name": "ruin_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "bone, single bone",
+      "id": "a09d2952-2e2a-457a-9a31-552918fdd028",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_04": {
+   "type": "scene",
+   "name": "ruin_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "tin can, dented, rusty",
+      "id": "2e0127b0-953f-4918-81e9-aa5c62a45866",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_05": {
+   "type": "scene",
+   "name": "ruin_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "teddy bear, worn, missing one eye, stitches",
+      "id": "217cef34-9a92-435e-ad9d-1bb3bdd7572e",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_06": {
+   "type": "scene",
+   "name": "ruin_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "candle, extinguished, wisp of smoke",
+      "id": "281a9921-9592-4947-8b1f-69b1f6fa68bd",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_07": {
+   "type": "scene",
+   "name": "ruin_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, pale, ghostly purple aura",
+      "id": "c7e79a86-783a-4eab-96d6-50137ba64fab",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_08": {
+   "type": "scene",
+   "name": "ruin_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "stingray, bat wings, dark",
+      "id": "5ee1fd1b-34e7-4a1f-a868-f1023a9c52ba",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_09": {
+   "type": "scene",
+   "name": "ruin_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "toad, tiny crown, regal",
+      "id": "8de5abb3-2c03-45d4-adb2-e47bb54b702b",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_10": {
+   "type": "scene",
+   "name": "ruin_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "catfish, bandana, holding can opener",
+      "id": "573a6b6a-7077-4d95-ba5d-57b8f71e54b3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_11": {
+   "type": "scene",
+   "name": "ruin_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "eel, fangs, small black cape, subtle glow",
+      "id": "3ab0a94e-76f9-4513-a3ce-241bbbeebc67",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_12": {
+   "type": "scene",
+   "name": "ruin_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, one giant eye, staring, subtle glow",
+      "id": "526be75b-0f23-4719-8da2-2166a39902d3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_13": {
+   "type": "scene",
+   "name": "ruin_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "vhs tape, static noise, subtle glow",
+      "id": "94129fee-df48-4e24-bb12-7cd9f182f87a",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_14": {
+   "type": "scene",
+   "name": "ruin_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crocodile, giant, moss covered, soft glow, sparkles",
+      "id": "ae9bee63-2a24-45c0-9aac-c2dda9e838e7",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "ruin_15": {
+   "type": "scene",
+   "name": "ruin_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, warm glow, soft light, soft glow, sparkles",
+      "id": "ac9f8e16-45c3-4cc4-8a61-ceabf6581f0b",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_01": {
+   "type": "scene",
+   "name": "dream_01",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "small fish, cotton candy, pastel pink",
+      "id": "13b0f627-82d3-486f-b9cd-0387ab106e54",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_02": {
+   "type": "scene",
+   "name": "dream_02",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "crucian carp, sleeping, nightcap, zzz",
+      "id": "20c71ad5-fdc8-43a7-b7db-89cecf6f59eb",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_03": {
+   "type": "scene",
+   "name": "dream_03",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "snail, macaron shell, pastel",
+      "id": "cc2cb1fc-4fd7-43ce-9222-d06eccdad63d",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_04": {
+   "type": "scene",
+   "name": "dream_04",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "candy wrapper, twisted, strawberry pattern",
+      "id": "86497cbe-24b4-4b2f-93bf-4b68a5ede016",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_05": {
+   "type": "scene",
+   "name": "dream_05",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "sock, single striped sock",
+      "id": "fefc770e-3070-4bf7-b455-ec589c1ae2a3",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_06": {
+   "type": "scene",
+   "name": "dream_06",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "soap bubble, iridescent",
+      "id": "aa3ae91b-94cd-410e-854a-0af0436fdd8c",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_07": {
+   "type": "scene",
+   "name": "dream_07",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "guppy, rainbow tail",
+      "id": "beb2a6d7-caa1-4520-8fc3-4e9599ea1284",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_08": {
+   "type": "scene",
+   "name": "dream_08",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "fish, cat ears, whiskers, cat face",
+      "id": "72ce2f0a-4ac7-4158-bf6f-fffa3c564d1c",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_09": {
+   "type": "scene",
+   "name": "dream_09",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "jellyfish, caramel pudding shape",
+      "id": "3ca92560-aad5-4ce3-8649-7ed675b90e62",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_10": {
+   "type": "scene",
+   "name": "dream_10",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "rubber duck, yellow, captain hat",
+      "id": "c6fd8e89-b60b-4415-861b-535d74244e53",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_11": {
+   "type": "scene",
+   "name": "dream_11",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "seahorse, unicorn horn, pastel mane, subtle glow",
+      "id": "7ace46e7-b9d1-4b55-a852-dd2bf4c28c96",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_12": {
+   "type": "scene",
+   "name": "dream_12",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "carp, crescent moon shape, pale glow, subtle glow",
+      "id": "7de1da5d-6ed5-4a30-87ac-44c61912d9e5",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_13": {
+   "type": "scene",
+   "name": "dream_13",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "pufferfish, birthday cake decoration, candle on head, subtle glow",
+      "id": "0002cd69-dc89-4a03-8358-fcc6d4083c2b",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_14": {
+   "type": "scene",
+   "name": "dream_14",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "whale, pastel, clouds, dream bubbles, soft glow, sparkles",
+      "id": "7f12591e-ae67-4efe-a21c-fed1d98aee93",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  },
+  "dream_15": {
+   "type": "scene",
+   "name": "dream_15",
+   "resolution": "square",
+   "slots": [
+    [
+     {
+      "prompt": "goldfish, star-shaped tail, sparkles, soft glow, sparkles",
+      "id": "e3af6e24-4554-489c-8491-b43f25fb7abf",
+      "enabled": true
+     }
+    ]
+   ],
+   "meta": {},
+   "imageMap": [],
+   "mains": []
+  }
+ },
+ "library": {},
+ "presetShareds": {}
+}

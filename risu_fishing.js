@@ -1,11 +1,14 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.0.0
+//@version 1.1.0
+//@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
-//@arg image_base string 물고기 이미지 폴더 주소 (비우면 이모지). 예: https://raw.githubusercontent.com/아이디/저장소/main/fish
+//@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
+//@link https://github.com/bampibubu-blip/risu-fishing/issues 버그 제보
+//@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.0.0 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.1.0 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -675,9 +678,12 @@ ${info}` },
   // ─────────────────────────────── 물고기 그림 ───────────────────────────────
   // 이미지가 준비되면 image_base 폴더에 '<지역>_<번호 두 자리>.png'로 올리면 된다 (예: fantasy_01.png).
   // 불러오지 못한 그림은 자동으로 이모지로 돌아간다.
-  let ART_BASE = '';
+  const DEFAULT_ART_BASE = 'https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/fish';
+  let ART_BASE = DEFAULT_ART_BASE;
   async function loadArtBase() {
-    try { ART_BASE = String((await Risuai.getArgument('image_base')) || '').trim().replace(/\/+$/, ''); } catch (_) { ART_BASE = ''; }
+    let v = '';
+    try { v = String((await Risuai.getArgument('image_base')) || '').trim().replace(/\/+$/, ''); } catch (_) {}
+    ART_BASE = !v ? DEFAULT_ART_BASE : /^(none|off|emoji|0)$/i.test(v) ? '' : v;
   }
   const artFile = key => {
     if (!key || key.startsWith('sig:')) return null; // 고유종은 이미지가 없다
@@ -1607,7 +1613,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.0.0 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.1.0 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
