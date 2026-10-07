@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.1.1
+//@version 1.1.2
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.1.1 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.1.2 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -302,6 +302,7 @@
     charCasts: {},  // 캐릭터별 던진 횟수
     sigs: {},       // 캐릭터 id -> 고유종 { emoji, name, desc, min, max, charName, region, at }
     sigDex: {},     // 'sig:캐릭터 id' -> { n, best, g }
+    sigTry: {},     // 캐릭터 id -> { st, n, err } 마지막 생성 시도
     createdAt: Date.now(),
   });
 
@@ -330,6 +331,7 @@
       charCasts: s.charCasts || {},
       sigs: s.sigs || {},
       sigDex: s.sigDex || {},
+      sigTry: s.sigTry || {},
     };
   }
 
@@ -545,24 +547,32 @@
     return null;
   }
   const sigBusy = new Set();
+  let lastSigErr = '';
   // 던질 때마다 호출: 다음 단계 조건이 되면 만든다. 실패하면 5번 더 던진 뒤 다시 시도.
   async function maybeMakeSig(charId, force) {
     const st = nextStage(charId);
     if (!st || sigBusy.has(charId)) return;
     const n = state.charCasts[charId] || 0, after = SIG_STAGES[st - 1].after;
-    if (!force && (n < after || (n - after) % 5 !== 0)) return;
+    const last = state.sigTry[charId];
+    if (!force) {
+      if (n < after) return;
+      if (last && last.st === st && last.err && n - last.n < 3) return; // 실패 직후엔 3번 쉬었다가
+    }
     sigBusy.add(charId);
+    if (visible && tab === 'dex') render();
+    const fail = err => { state.sigTry[charId] = { st, n, err }; save(); console.log('[낚시터] 고유종 생성 실패: ' + err); };
     try {
       const char = await Risuai.getCharacter();
-      if (!char || (char.chaId || char.name) !== charId) return;
+      if (!char || (char.chaId || char.name) !== charId) return fail('지금 열린 채팅방의 캐릭터가 달라요');
       const sg = await requestSig(char, st);
-      if (!sg) return;
+      if (!sg) return fail(lastSigErr || '보조 모델 응답을 받지 못했어요');
       state.sigs[sigId(charId, st)] = { ...sg, stage: st, charId, charName: char.name || '', region: state.regions[charId]?.r || 'city', at: Date.now() };
+      delete state.sigTry[charId];
       save();
-      if (visible) { sigToast(char.name, st); if (tab === 'dex') render(); }
+      if (visible) sigToast(char.name, st);
     } catch (e) {
-      console.log('[낚시터] 고유종 생성 실패: ' + (e?.message || e));
-    } finally { sigBusy.delete(charId); }
+      fail(e?.message || String(e));
+    } finally { sigBusy.delete(charId); if (visible && tab === 'dex') render(); }
   }
 
   // 다시 만들기권: 새로 만든 뒤에야 권을 쓴다. 예전 고유종은 낚은 기록과 함께 보관한다.
@@ -615,11 +625,19 @@
 
 ${info}` },
     ];
-    for (const mode of ['otherAx', 'submodel']) {
+    lastSigErr = '';
+    const tries = [{ mode: 'otherAx' }, { mode: 'submodel' }, { mode: 'otherAx', allowPlugins: true }];
+    for (const t of tries) {
       let res;
-      try { res = await Risuai.runLLMModel({ mode, messages }); } catch (_) { continue; }
-      const sg = parseSig(await llmText(res), maxCm);
+      try { res = await Risuai.runLLMModel({ ...t, messages }); }
+      catch (e) { lastSigErr = '보조 모델 호출 실패: ' + (e?.message || e); continue; }
+      if (res && res.type === 'fail') { lastSigErr = '보조 모델 오류: ' + String(res.result || '').slice(0, 80); continue; }
+      const text = await llmText(res);
+      if (!text) { lastSigErr = '보조 모델이 빈 응답을 보냈어요'; continue; }
+      const sg = parseSig(text, maxCm);
       if (sg) return sg;
+      lastSigErr = '응답 형식이 맞지 않아요';
+      console.log('[낚시터] 고유종 응답 원문: ' + text.slice(0, 300));
     }
     return null;
   }
@@ -875,6 +893,7 @@ ${info}` },
     .sigchar{padding:4px 16px 8px}
     .sigchar h3{font-size:15px;margin:14px 0 2px;display:flex;align-items:baseline;gap:8px}
     .sigchar h3 small{font-size:12px;color:var(--muted);font-weight:500}
+    .signext .link{margin-left:6px;font-size:13px}
     .signext{font-size:13px;color:var(--muted);padding:10px 0;border-bottom:1px solid var(--line)}
     .sigold{font-size:12px;color:var(--muted);margin-top:12px}
     .sigacts{display:flex;gap:12px;margin-top:4px}
@@ -1190,6 +1209,16 @@ ${info}` },
   function regionCount(r) {
     return r.fish.reduce((a, _, i) => a + (state.dex[`${r.id}:${i}`] ? 1 : 0), 0);
   }
+  function sigStatus(cid, nx, n) {
+    const after = SIG_STAGES[nx - 1].after, t = state.sigTry[cid];
+    if (sigBusy.has(cid)) return `${josa(sigLabel(nx), '을', '를')} 만드는 중이에요.`;
+    if (n < after) return `${sigLabel(nx)}: ${after - n}번 더 낚시하면 나타나요.`;
+    const here = cid === spot.charId;
+    const btn = here ? ` <button class="link" data-mksig="${esc(cid)}">지금 만들기</button>` : '';
+    if (t && t.st === nx && t.err) return `${josa(sigLabel(nx), '을', '를')} 만들지 못했어요. (${esc(t.err)})${here ? btn : ' 이 캐릭터의 채팅방에서 다시 시도할 수 있어요.'}`;
+    return `${josa(sigLabel(nx), '이', '가')} 곧 나타나요.${btn}`;
+  }
+
   function renderSigs(main, total) {
     const live = Object.keys(state.sigs).filter(id => !isArchived(id));
     const got = live.filter(id => state.sigDex['sig:' + id]).length;
@@ -1208,7 +1237,7 @@ ${info}` },
       const archived = Object.keys(state.sigs).filter(id => isArchived(id) && sigChar(id) === cid);
       return `<div class="sigchar"><h3>${esc(name)}<small>${n}번 낚시</small></h3>
         ${[1, 2, 3].map(st => state.sigs[sigId(cid, st)] ? sigRow(sigId(cid, st)) : '').join('')}
-        ${nx ? `<div class="signext">${sigBusy.has(cid) ? `${josa(sigLabel(nx), '을', '를')} 만드는 중이에요.` : `${sigLabel(nx)}: ${Math.max(0, SIG_STAGES[nx - 1].after - n)}번 더 낚시하면 나타나요.`}</div>` : ''}
+        ${nx ? `<div class="signext">${sigStatus(cid, nx, n)}</div>` : ''}
         ${archived.length ? `<div class="sigold">이전 고유종</div>${archived.map(sigRow).join('')}` : ''}</div>`;
     };
     main.innerHTML = `
@@ -1217,6 +1246,7 @@ ${info}` },
       <p class="shopnote" style="padding-top:12px">한 캐릭터와 ${SIG_STAGES.map(x => x.after).join(', ')}번 낚시할 때마다 그 캐릭터만의 고유종이 한 단계씩 생겨요. 낚은 고유종에는 그림을 넣을 수 있고, 다시 만들기권으로 새로 만들 수도 있어요. 다시 만들기권 ${state.gear.rerolls}장</p>
       ${chars.length ? chars.map(charBlock).join('') : `<div class="empty">아직 고유종이 없어요.</div>`}`;
     main.querySelectorAll('[data-reroll]').forEach(b => b.onclick = () => rerollSig(b.dataset.reroll));
+    main.querySelectorAll('[data-mksig]').forEach(b => b.onclick = () => maybeMakeSig(b.dataset.mksig, true));
     main.querySelectorAll('.regions button').forEach(b => b.onclick = () => { dexRegion = b.dataset.r; dexDetail = null; render(); });
     const picker = document.createElement('input');
     picker.type = 'file'; picker.accept = 'image/png,image/jpeg,image/webp,image/gif'; picker.style.display = 'none';
@@ -1613,7 +1643,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.1.1 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.1.2 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
