@@ -1598,9 +1598,9 @@ ${info}` },
   await reg('채팅 메뉴 버튼', () => Risuai.registerButton(
     { name: '낚시하기', icon: '🎣', iconType: 'html', location: 'chat', id: 'risu-fishing-cast' },
     () => open('fish')));
-  await reg('설정 메뉴', () => Risuai.registerSetting('🎣 리스 낚시터', () => open('fish'), '🎣', 'html', 'risu-fishing-setting'));
+  await reg('설정 메뉴', () => Risuai.registerSetting('리스 낚시터', () => open('fish'), '🎣', 'html', 'risu-fishing-setting'));
   await reg('사이드바 버튼', () => Risuai.registerButton(
-    { name: '낚시 도감', icon: '📖', iconType: 'html', location: 'hamburger', id: 'risu-fishing-dex' },
+    { name: '낚시 도감', icon: '🐟', iconType: 'html', location: 'hamburger', id: 'risu-fishing-dex' },
     () => open('dex')));
 
   await reg('언로드 콜백', () => Risuai.onUnload(async () => {
