@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.1.0
+//@version 1.1.1
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.1.0 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.1.1 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -1613,7 +1613,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.1.0 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.1.1 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
