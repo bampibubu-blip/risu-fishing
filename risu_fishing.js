@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.1.3
+//@version 1.2.0
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.1.3 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.2.0 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -46,7 +46,7 @@
   const REGIONS = [
     { id: 'fantasy', name: '판타지 호수', icon: '🏰',
       water: ['#e3eff5', '#86b9cf'],
-      kw: ['마법','왕국','기사단','엘프','드래곤','마왕','용사','공주','길드','마나석','던전','마법사','magic','kingdom','knight','elf','elves','dragon','demon lord','princess','guild','dungeon','fantasy','wizard','sorcer'],
+      kw: ['마법','마법사','마술사','마녀','마력','마나석','왕국','왕자','공주','왕녀','황녀','제국','기사단','성기사','기사도','엘프','드워프','오크','고블린','드래곤','용족','마왕','마족','용사','성녀','신관','사제','길드','모험가','던전','몬스터','마물','정령','이세계','판타지','영지','영주','공작','백작','후작','남작','귀족','영애','영식','중세','성채','magic','mage','wizard','witch','sorcerer','sorceress','sorcery','kingdom','empire','prince','princess','knight','paladin','elf','elves','dwarf','orc','goblin','dragon','demon lord','demon king','hero','saint','priest','guild','adventurer','dungeon','monster','mana','isekai','fantasy','medieval','castle','duke','duchess','baron','noble','nobility'],
       fish: [
         ['🐟','마나 송사리',3,8,'물속에서 희미하게 빛난다'],
         ['🐸','개구리 왕자(아님)',5,12,'키스해도 그냥 개구리'],
@@ -66,7 +66,7 @@
       ] },
     { id: 'city', name: '도시 운하', icon: '🌃',
       water: ['#e7e6ef', '#8f98bd'],
-      kw: ['회사','직장','아파트','도시','편의점','지하철','아이돌','재벌','본부장','연예인','현대','마피아','조직','경찰','형사','병원','의사','군인','스마트폰','러시아','모스크바','미국','뉴욕','서울','도쿄','office','company','apartment','city','idol','ceo','celebrity','subway','modern','contemporary','mafia','bratva','police','detective','hospital','doctor','smartphone','russia','moscow','new york','seoul','tokyo'],
+      kw: ['회사','직장','사무실','부장','과장','비서','출근','퇴근','야근','아파트','오피스텔','원룸','자취','도시','편의점','지하철','택시','아이돌','연예인','배우','가수','기획사','재벌','본부장','회장님','사장님','현대','마피아','조직','야쿠자','경찰','형사','검사','변호사','의사','간호사','병원','군인','군대','특수부대','용병','킬러','스마트폰','핸드폰','카톡','메신저','인스타','유튜버','스트리머','방송','러시아','모스크바','미국','뉴욕','서울','강남','홍대','부산','도쿄','상하이','홍콩','런던','호텔','술집','클럽','동거','계약결혼','옆집','office','company','coworker','boss','ceo','secretary','apartment','city','convenience store','subway','idol','celebrity','actor','actress','singer','chaebol','modern','contemporary','mafia','bratva','yakuza','gang','cartel','police','cop','detective','lawyer','prosecutor','doctor','nurse','hospital','soldier','military','mercenary','assassin','hitman','smartphone','texting','instagram','streamer','youtuber','russia','moscow','america','new york','seoul','tokyo','london','hotel','nightclub','roommate','neighbor'],
       fish: [
         ['🐟','출근길 피라미',5,10,'늘 지쳐 보인다'],
         ['🐟','야근 숭어',20,40,'눈 밑이 거뭇하다'],
@@ -86,7 +86,7 @@
       ] },
     { id: 'school', name: '학교 수영장', icon: '🏫',
       water: ['#e6f4f8', '#62bcd8'],
-      kw: ['학교','학생','교실','선배','후배','동아리','학원물','축제','반장','선생님','대학','기숙사','고등학','school','student','classroom','senpai','teacher','academy','university','college','dormitory','high school'],
+      kw: ['학교','학생','학년','교실','같은 반','반 친구','선배','후배','동아리','학원','축제','반장','선생님','담임','교사','교수','대학','대학생','캠퍼스','기숙사','고등학','중학','초등학','수업','시험','수능','교복','체육','학생회','졸업','입학','방과후','소꿉친구','청춘','school','student','classmate','classroom','senpai','kouhai','teacher','professor','academy','university','college','campus','dormitory','high school','uniform','exam','graduation','homeroom','student council','childhood friend'],
       fish: [
         ['🐟','지각 송사리',3,7,'식빵을 물고 있다'],
         ['🐟','매점빵 붕어',10,20,'4교시 끝나면 사라진다'],
@@ -106,7 +106,7 @@
       ] },
     { id: 'space', name: '우주 성운', icon: '🌌',
       water: ['#e9e7f3', '#7a74ad'],
-      kw: ['우주','함선','행성','로봇','안드로이드','사이버','인공지능','외계인','함장','성간','space','spaceship','starship','planet','robot','android','cyborg','cyberpunk','artificial intelligence','alien','sci-fi','mecha','galaxy'],
+      kw: ['우주','우주선','함선','함대','행성','은하','성계','로봇','안드로이드','사이보그','사이버','사이버펑크','인공지능','기계','메카','외계','외계인','함장','성간','디스토피아','연구소','실험체','클론','해커','홀로그램','네온','식민지','에스에프','space','spaceship','starship','fleet','planet','galaxy','robot','android','cyborg','cyberpunk','artificial intelligence','alien','sci-fi','science fiction','mecha','futuristic','dystopia','dystopian','laboratory','experiment','clone','hacker','hologram','neon','synthetic','colony','astronaut'],
       fish: [
         ['🐟','별가루 플랑크톤',1,3,'한 움큼에 은하 하나'],
         ['🐟','궤도 정어리',10,20,'90분마다 지구를 돈다'],
@@ -126,7 +126,7 @@
       ] },
     { id: 'murim', name: '무협 계곡', icon: '⛩️',
       water: ['#e7efe8', '#80ad95'],
-      kw: ['무림','강호','문파','내공','협객','황제','궁궐','조선','도사','요괴','무협','사극','murim','martial art','wuxia','cultivation','emperor','imperial palace','joseon','taoist','yokai'],
+      kw: ['무림','강호','문파','무협','내공','무공','검술','협객','사부','황제','황궁','궁궐','후궁','조선','고려','사극','왕세자','세자','저하','전하','마마','도사','요괴','구미호','선녀','신선','수련','객잔','마교','정파','사파','무당','소림','화산파','한복','양반','기생','대감','도령','낭자','아씨','선비','murim','martial art','martial arts','wuxia','xianxia','cultivation','cultivator','sect','emperor','imperial','palace','concubine','joseon','goryeo','dynasty','taoist','yokai','gumiho','nine-tailed','hanbok','eunuch'],
       fish: [
         ['🐟','하산 피라미',4,9,'사부 몰래 내려왔다'],
         ['🐟','대나무 붕어',15,25,'마디마다 비늘'],
@@ -146,7 +146,7 @@
       ] },
     { id: 'deep', name: '심해', icon: '🌊',
       water: ['#dfebf2', '#4d86a8'],
-      kw: ['바다','해적','무인도','항구','인어','선장','항해','해변','선박','해군','리조트','ocean','pirate','island','harbor','mermaid','sailor','voyage','beach','navy'],
+      kw: ['바다','해적','무인도','섬마을','항구','인어','선장','선원','항해','해변','바닷가','선박','해군','리조트','휴양지','어부','어촌','해양','심해','잠수','크라켄','세이렌','등대','sea','ocean','pirate','island','harbor','harbour','mermaid','merman','sailor','voyage','beach','navy','fisherman','sailing','underwater','siren','kraken','resort','lighthouse'],
       fish: [
         ['🐟','눈 없는 정어리',8,15,'빛을 본 적이 없다'],
         ['🐟','아귀 새끼',10,20,'등불이 아직 꼬마전구'],
@@ -166,7 +166,7 @@
       ] },
     { id: 'ruin', name: '폐허 늪', icon: '🧟',
       water: ['#eceee4', '#94a07a'],
-      kw: ['좀비','아포칼립스','멸망','폐허','생존자','호러','괴담','저주','귀신','뱀파이어','감염','zombie','apocalypse','post-apocalyptic','survivor','horror','cursed','ghost','vampire','infected','undead'],
+      kw: ['좀비','아포칼립스','멸망','폐허','생존','생존자','호러','공포','괴담','저주','귀신','유령','악령','뱀파이어','흡혈귀','늑대인간','감염','바이러스','괴물','크리처','묵시록','핵전쟁','방사능','폐건물','살인마','연쇄살인','얀데레','오컬트','퇴마','zombie','apocalypse','post-apocalyptic','wasteland','ruin','ruins','survivor','survival','horror','cursed','curse','ghost','haunted','vampire','werewolf','infected','infection','virus','undead','creepy','eldritch','cult','serial killer','yandere','occult','exorcist'],
       fish: [
         ['🐟','좀비 피라미',4,10,'죽었는데 팔딱인다'],
         ['🐟','방사능 미꾸라지',15,25,'살짝 초록빛'],
@@ -186,7 +186,7 @@
       ] },
     { id: 'dream', name: '꿈속 연못', icon: '🍰',
       water: ['#f4eaf1', '#c3a5d1'],
-      kw: ['일상물','힐링','고양이','강아지','동물','동화','요정','디저트','귀여운','카페','slice of life','healing','kitten','puppy','fairy','fairytale','dessert','cozy','cafe'],
+      kw: ['일상','일상물','힐링','고양이','강아지','반려','동물','수인','토끼','햄스터','동화','요정','디저트','케이크','베이커리','빵집','카페','귀여운','육아','시골','농장','피크닉','꽃집','소확행','포근','slice of life','healing','wholesome','cozy','cat','kitten','dog','puppy','pet','bunny','rabbit','hamster','beastkin','catgirl','fairy','fairytale','fairy tale','dessert','cake','bakery','cafe','coffee shop','cute','farm','countryside'],
       fish: [
         ['🐟','솜사탕 송사리',3,7,'물에 녹는다'],
         ['🐟','낮잠 붕어',10,20,'낚여도 안 깬다'],
@@ -429,24 +429,31 @@
     return h >>> 0;
   }
 
-  const CLASSIFY_VERSION = 2;
-  // 영어 키워드는 단어 경계로, 한국어는 부분 일치로 센다 (예: 'ai'가 'said'에 걸리지 않게)
+  const CLASSIFY_VERSION = 3;
+  // 영어 키워드는 단어 단위(복수형 s/es 허용), 한국어는 부분 일치로 센다
   const KW_MATCHERS = REGIONS.map(r => r.kw.map(k => /[a-z]/i.test(k)
-    ? new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')}`, 'gi')
+    ? new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&')}(?:s|es)?\\b`, 'gi')
     : k));
+  const KW_CAP = 5; // 한 단어가 아무리 많이 나와도 5번까지만 센다
   function countKw(text, m) {
-    if (typeof m === 'string') { let n = 0, i = 0; while ((i = text.indexOf(m, i)) !== -1) { n++; i += m.length; } return n; }
-    return (text.match(m) || []).length;
+    if (typeof m === 'string') { let n = 0, i = 0; while (n < KW_CAP && (i = text.indexOf(m, i)) !== -1) { n++; i += m.length; } return n; }
+    return Math.min(KW_CAP, (text.match(m) || []).length);
   }
   function classify(char) {
-    const text = [char.name, char.desc, char.personality, char.scenario, (char.tags || []).join(' ')]
+    const cut = (v, n) => String(v || '').slice(0, n);
+    const lore = (char.globalLore || []).map(l => `${l.key || ''} ${cut(l.content, 600)}`).join(' ');
+    // 읽는 범위: 태그(가중치 3) + 이름·설명·성격·시나리오·첫 메시지·제작자 메모·로어북 일부
+    const tags = (char.tags || []).join(' ').toLowerCase();
+    const text = [char.name, cut(char.desc, 8000), cut(char.personality, 2000), cut(char.scenario, 2000),
+                  cut(char.firstMessage, 3000), cut(char.creatorNotes, 2000), cut(lore, 8000)]
       .filter(Boolean).join(' ').toLowerCase();
-    const scores = KW_MATCHERS.map(list => list.reduce((sum, m) => sum + countKw(text, m), 0));
+    const scores = KW_MATCHERS.map(list => list.reduce((sum, m) => sum + countKw(text, m) + 3 * countKw(tags, m), 0));
     const max = Math.max(...scores);
-    // 아무것도 안 걸리면 현대물로 본다 (가장 흔한 장르)
-    if (max === 0) return 'city';
+    const seed = hashStr(char.chaId || char.name || 'x');
+    // 아무것도 안 걸리면 캐릭터마다 고정된 무작위 지역
+    if (max === 0) return REGIONS[seed % REGIONS.length].id;
     const cands = REGIONS.filter((_, i) => scores[i] === max);
-    return cands[hashStr(char.chaId || char.name || 'x') % cands.length].id;
+    return cands[seed % cands.length].id;
   }
 
   async function currentSpot() {
@@ -778,10 +785,47 @@ ${info}` },
   // ─────────────────────────────── UI ───────────────────────────────
   const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
   const EMPTY_MSG = '미끼가 없어요. 채팅을 하거나 번역 같은 보조 기능을 쓰면 미끼가 생겨요.';
-  function shade(hex) { // 물 아래쪽을 조금 더 진하게
-    const n = parseInt(hex.slice(1), 16), f = .82;
+  function shade(hex, f = .82) { // f<1이면 어둡게
+    const n = parseInt(hex.slice(1), 16);
     return '#' + [16, 8, 0].map(b => Math.round(((n >> b) & 255) * f).toString(16).padStart(2, '0')).join('');
   }
+  function tint(hex, t) { // 흰색과 섞어 밝게 (t: 0~1)
+    const n = parseInt(hex.slice(1), 16);
+    return '#' + [16, 8, 0].map(b => { const c = (n >> b) & 255; return Math.round(c + (255 - c) * t).toString(16).padStart(2, '0'); }).join('');
+  }
+  // 물결 한 줄 (SVG를 가로로 이어 붙여 흘려보낸다)
+  // ── 낚시터 풍경: 평면 일러스트. 하늘 단색 + 수평선 실루엣 + 물결 경계의 색 띠
+  // 좌표계 400×300, 수평선 y=90
+  const SKYLINES = {
+    fantasy: 'M0 90 L0 80 Q40 70 80 78 Q120 86 160 76 L160 90 Z M250 90 L250 62 L246 62 L256 48 L266 62 L262 62 L262 70 L278 70 L278 56 L274 56 L286 38 L298 56 L294 56 L294 70 L310 70 L310 60 L306 60 L316 46 L326 60 L322 60 L322 90 Z M330 90 Q360 74 400 80 L400 90 Z',
+    city: 'M0 90 L0 74 L18 74 L18 66 L34 66 L34 78 L46 78 L46 58 L62 58 L62 70 L74 70 L74 50 L84 50 L84 46 L92 46 L92 50 L102 50 L102 72 L118 72 L118 62 L136 62 L136 80 L150 80 L150 68 L170 68 L170 76 L200 76 L200 84 L230 84 L230 64 L244 64 L244 56 L258 56 L258 70 L274 70 L274 44 L288 44 L288 60 L300 60 L300 74 L320 74 L320 66 L336 66 L336 78 L356 78 L356 60 L372 60 L372 72 L400 72 L400 90 Z',
+    school: 'M0 90 Q60 74 130 82 Q170 86 200 84 L200 90 Z M210 90 L210 70 L250 70 L250 60 L262 60 L262 48 L270 42 L278 48 L278 60 L290 60 L290 70 L330 70 L330 90 Z M300 90 Q350 78 400 84 L400 90 Z',
+    space: 'M0 90 Q100 84 200 88 Q300 84 400 88 L400 90 Z',
+    murim: 'M0 90 L40 58 L70 76 L110 40 L150 72 L180 60 L210 90 Z M190 90 L240 50 L270 70 L300 46 L340 80 L370 64 L400 74 L400 90 Z M292 90 L292 74 L284 74 L300 62 L316 74 L308 74 L308 82 L320 82 L300 70 L280 82 L292 82 Z',
+    deep: 'M0 90 Q30 80 60 84 Q80 86 90 90 Z M44 84 L44 54 L40 54 L48 46 L56 54 L52 54 L52 84 Z M300 90 L300 86 L338 86 L344 90 Z M314 86 L314 74 L326 80 L314 80 Z',
+    ruin: 'M0 90 L0 76 L14 76 L14 60 L22 64 L28 56 L28 78 L48 78 L48 90 Z M120 90 L120 70 L130 66 L134 52 L142 58 L142 70 L156 74 L156 90 Z M250 90 L250 54 L258 50 L262 58 L270 46 L270 72 L284 72 L284 64 L292 68 L292 90 Z M330 90 Q370 80 400 84 L400 90 Z',
+    dream: 'M0 90 Q30 72 60 84 Q90 70 120 84 Q150 76 170 90 Z M240 90 Q270 74 300 82 Q330 68 360 82 Q385 74 400 80 L400 90 Z M296 82 L296 72 L290 72 L302 62 L314 72 L308 72 L308 82 Z',
+  };
+  function sceneSVG(r) {
+    const sky = tint(r.water[0], .2), far = shade(sky, .88), w = r.water[1];
+    // 물결 경계를 가진 띠: 아래로 갈수록 진하고 물결이 크다
+    const band = (y, amp, per, color) => {
+      let d = `M0 ${y}`;
+      for (let x = 0; x < 400; x += per) d += ` q${per / 4} -${amp} ${per / 2} 0 t${per / 2} 0`;
+      return `<path d="${d} L400 300 L0 300 Z" fill="${color}"/>`;
+    };
+    const extra = r.id === 'space'
+      ? `<circle cx="300" cy="44" r="18" fill="${far}"/><ellipse cx="300" cy="44" rx="32" ry="6" fill="none" stroke="${far}" stroke-width="3"/><circle cx="90" cy="30" r="5" fill="${far}"/>`
+      : '';
+    return `<svg class="scene" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+      <rect width="400" height="90" fill="${sky}"/>${extra}
+      <path d="${SKYLINES[r.id] || ''}" fill="${far}"/>
+      <rect y="90" width="400" height="210" fill="${w}"/>
+      ${band(118, 2, 50, shade(w, .94))}${band(152, 3, 70, shade(w, .88))}${band(196, 4, 100, shade(w, .81))}${band(250, 5, 140, shade(w, .74))}
+    </svg>`;
+  }
+
+
   const fmtSize = cm => cm >= 100 ? `${(cm / 100).toFixed(2)} m` : `${cm.toFixed(1)} cm`;
 
   document.head.innerHTML = `<meta charset="utf-8"><style>
@@ -809,8 +853,20 @@ ${info}` },
     .spot b{color:var(--ink);font-weight:600}
     .spot .new{color:var(--float)}
     .pond{position:relative;margin:10px 16px 12px;height:300px;border-radius:10px;overflow:hidden;cursor:pointer;user-select:none;touch-action:manipulation}
-    .pond .ripples{position:absolute;left:0;right:0;top:30%;bottom:0;background:repeating-linear-gradient(180deg,rgba(255,255,255,.18) 0 1px,transparent 1px 18px)}
-    .pond .horizon{position:absolute;left:0;right:0;top:30%;height:1px;background:rgba(255,255,255,.7)}
+    .pond .scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .bshadow{position:absolute;left:50%;top:58%;width:22px;height:6px;margin:11px 0 0 -11px;border-radius:50%;background:rgba(20,35,50,.28);display:none}
+    .bshadow.idle,.bshadow.fake,.bshadow.bite{display:block}
+    .bshadow.idle{animation:shbob 2.4s ease-in-out infinite}
+    .bshadow.bite{animation:shdip .28s ease-in-out infinite}
+    @keyframes shbob{50%{transform:scaleX(.85)}}
+    @keyframes shdip{50%{transform:scale(1.5,1.2);opacity:.6}}
+    .bobber.drop{display:block;animation:drop .42s cubic-bezier(.5,0,1,1)}
+    @keyframes drop{from{transform:translate(-30px,-150px) scale(.7)}to{transform:none}}
+    .splash{position:absolute;left:50%;top:58%;width:0;height:0;pointer-events:none}
+    .splash i{position:absolute;left:-4px;top:0;width:8px;height:9px;border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.4);animation:drip .6s cubic-bezier(.2,.6,.4,1) forwards}
+    @keyframes drip{0%{transform:translate(0,0) scale(.6)}45%{transform:translate(calc(var(--dx)*.6),var(--dy)) scale(1)}100%{transform:translate(var(--dx),6px) scale(.4);opacity:0}}
+    .splash b{position:absolute;left:-34px;top:4px;width:68px;height:18px;border:2px solid rgba(255,255,255,.9);border-radius:50%;animation:splashring .7s ease-out forwards}
+    @keyframes splashring{from{transform:scale(.2);opacity:1}to{transform:scale(1.5);opacity:0}}
     .bobber{position:absolute;left:50%;top:58%;width:16px;height:24px;margin:-12px 0 0 -8px;border-radius:50% 50% 45% 45%;background:linear-gradient(var(--float) 0 48%,#fff 48%);box-shadow:0 1px 0 rgba(34,49,63,.25);display:none}
     .bobber.idle,.bobber.fake,.bobber.bite{display:block}
     .bobber.idle{animation:bob 2.4s ease-in-out infinite}
@@ -938,7 +994,9 @@ ${info}` },
     .aq-bub{position:absolute;bottom:26px;width:6px;height:6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85);animation:bub 4s linear infinite;pointer-events:none}
     .aq-bub.b2{animation-duration:5.5s;animation-delay:1.7s}
     @keyframes bub{from{transform:translateY(0);opacity:0}10%{opacity:1}to{transform:translateY(-290px);opacity:.2}}
-    .fishy{position:absolute;left:0;top:0;background:none;border:none;padding:0;line-height:1;cursor:pointer;will-change:transform;touch-action:manipulation}
+    .fishy{position:absolute;left:0;top:0;background:none;border:none;padding:0;line-height:1;cursor:grab;will-change:transform;touch-action:none;user-select:none}
+    .fishy.dragging{cursor:grabbing;z-index:2}
+    .fishy.dragging .body{filter:drop-shadow(0 6px 4px rgba(34,49,63,.25))}
     .fishy .body{display:block;filter:drop-shadow(0 2px 1px rgba(34,49,63,.15))}
     .fishy.gold .body{filter:sepia(1) saturate(3) hue-rotate(-12deg) drop-shadow(0 0 4px rgba(255,214,90,.9))}
     .fishy.sel::after{content:'';position:absolute;left:50%;bottom:-9px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--ink)}
@@ -997,8 +1055,9 @@ ${info}` },
       ${hookState === 'off' ? `<div class="notice">권한이 없어서 미끼를 모으지 못하고 있어요. 플러그인을 다시 불러온 뒤 권한 요청을 허용해 주세요.</div>` : ''}
       <div class="spot">${spot.charName ? `${esc(spot.charName)}의 낚시터, ` : ''}<b>${r.name}</b>${spot.charId ? ' <button class="link" id="change">바꾸기</button>' : ''}${spot.isNew ? '<br><span class="new">처음 와 보는 낚시터예요</span>' : ''}</div>
       ${picking ? `<div class="pickhint">지역을 바꾸면 이동권 1장을 써요. 남은 이동권 ${state.gear.tickets}장</div><div class="picker">${REGIONS.map(x => `<button class="${x.id === r.id ? 'on' : ''}" data-r="${x.id}">${x.name}</button>`).join('')}</div>` : ''}
-      <div class="pond" id="pond" style="background:linear-gradient(${r.water[0]} 0 30%,${r.water[1]} 30%,${shade(r.water[1])} 100%)">
-        <div class="horizon"></div><div class="ripples"></div>
+      <div class="pond" id="pond">
+        ${sceneSVG(r)}
+        <div class="bshadow" id="bshadow"></div>
         <div class="ring" id="ring"></div>
         <div class="reelbox" id="reelbox"><div class="lbl"><span>줄 장력</span><span id="reeltip">초록 구간에 바늘을 두세요</span></div>
           <div class="track" id="track"><div class="zone" id="zone"></div><div class="needle" id="needle"></div></div>
@@ -1024,7 +1083,19 @@ ${info}` },
   }
 
   function setMsg(t) { const m = document.getElementById('msg'); if (m) m.textContent = t; }
-  function setBobber(cls) { const b = document.getElementById('bobber'); if (b) b.className = 'bobber ' + cls; }
+  function setBobber(cls) {
+    const b = document.getElementById('bobber'); if (b) b.className = 'bobber ' + cls;
+    const sh = document.getElementById('bshadow'); if (sh) sh.className = 'bshadow ' + (cls === 'drop' ? '' : cls);
+  }
+  // 찌가 떨어진 자리에 물방울과 파문
+  function splash() {
+    const pond = document.getElementById('pond'); if (!pond || reduceMotion) return;
+    const el = document.createElement('div'); el.className = 'splash';
+    el.innerHTML = '<b></b>' + [[-26, -30], [-14, -42], [-4, -48], [8, -44], [20, -36], [30, -22], [-34, -16]]
+      .map(([dx, dy]) => `<i style="--dx:${dx}px;--dy:${dy}px"></i>`).join('');
+    pond.appendChild(el);
+    setTimeout(() => el.remove(), 800);
+  }
   function setBang(on) { const b = document.getElementById('ring'); if (b) b.className = 'ring' + (on ? ' on' : ''); }
   function setAct(label, cls = '', disabled = false) {
     const a = document.getElementById('act');
@@ -1056,7 +1127,12 @@ ${info}` },
     sfx.cast();
     const waitMs = 2000 + Math.random() * 6000;
     fishing = { phase: 'wait', timers: [], fakeNow: false, catch: rollCatch(spot.regionId) };
-    setBobber('idle'); setBang(false);
+    setBang(false);
+    if (reduceMotion) setBobber('idle');
+    else {
+      setBobber('drop');
+      fishing.timers.push(setTimeout(() => { if (fishing?.phase === 'wait') { setBobber('idle'); splash(); } }, 420));
+    }
     setMsg('찌를 지켜보는 중. 살짝 흔들리는 건 가짜 입질이에요.');
     setAct('기다리는 중', '', false);
     // 가짜 입질 0~2회
@@ -1372,7 +1448,7 @@ ${info}` },
             <div class="ds">${fmtSize(sel.it.s)}. ${esc(sel.info.f[4])}</div>
             <div class="ds">${esc(sel.info.r.name)}${sel.it.c ? `, ${esc(sel.it.c)}와 낚음` : ''}</div>
             <div class="acts"><button class="btn sm" data-sell="${sel.n}">팔기, 조개 ${priceOf(sel.it)}개</button><button class="link" data-img="${sel.n}">어탁 이미지 저장</button></div></div></div>`
-          : items.length ? `<p class="shopnote" style="padding-top:10px">물고기를 누르면 자세히 볼 수 있어요.</p>` : ''}`
+          : items.length ? `<p class="shopnote" style="padding-top:10px">물고기를 누르면 자세히 볼 수 있고, 끌어서 옮길 수도 있어요.</p>` : ''}`
       : (items.length ? `<div class="tanklist">${items.slice().reverse().map(({ it, n, info }) => `
         <div class="titem"><div class="em ${it.g ? 'gold' : ''}">${art(it.k, info.f[0])}</div>
           <div class="body"><div class="nm">${it.g ? '황금 ' : ''}${esc(info.f[1])} <span style="color:${TIERS[info.tier].color};font-size:12px;font-weight:600">${info.sig ? sigLabel(info.stage) : TIERS[info.tier].label}</span></div>
@@ -1397,6 +1473,8 @@ ${info}` },
   function startAqua(items) {
     const aq = document.getElementById('aqua'); if (!aq) return;
     const W = aq.clientWidth, H = aq.clientHeight, SAND = 26;
+    const floorY = f => H - SAND - f.px * 0.8;   // 바닥에 닿은 높이
+    const surfaceY = 6;                          // 수면에 뜬 높이
     const prev = new Map(aquaFish.map(f => [f.n, f]));
     aquaFish = [];
     aq.querySelectorAll('.fishy').forEach(el => {
@@ -1408,24 +1486,78 @@ ${info}` },
       const kind = motionOf(f0[0]);
       const old = prev.get(n);
       const seed = hashStr(it.k + it.t);
-      const fish = old && old.kind === kind ? { ...old, el } : {
-        n, el, kind, px,
-        x: (seed % 1000) / 1000 * (W - px),
-        y: kind === 'float' ? 6 : kind === 'swim' ? 16 + ((seed >> 10) % 1000) / 1000 * (H - SAND - px - 30) : H - SAND - px * 0.8,
+      const restRot = kind === 'sink' ? ((seed % 40) - 20) : 0;
+      const savedX = kind === 'sink' && typeof it.pos === 'number' ? it.pos * (W - px) : null;
+      const fish = old && old.kind === kind ? { ...old, el, it, drag: false } : {
+        n, el, it, kind, px,
+        x: savedX ?? (seed % 1000) / 1000 * (W - px),
+        y: kind === 'float' ? surfaceY : kind === 'swim' ? 16 + ((seed >> 10) % 1000) / 1000 * (H - SAND - px - 30) : H - SAND - px * 0.8,
         vx: (kind === 'sink' ? 0 : (kind === 'crawl' ? 6 : kind === 'float' ? 8 : 18 + (3 - info.tier) * 6)) * ((seed & 1) ? 1 : -1),
-        ty: null, pause: 0, phase: (seed % 628) / 100, rot: kind === 'sink' ? ((seed % 40) - 20) : 0,
+        vy: 0, ty: null, pause: 0, phase: (seed % 628) / 100, rot: restRot, restRot, falling: false, rising: false,
       };
       fish.px = px;
       if (fish.kind === 'swim' && fish.ty === null) fish.ty = fish.y;
       aquaFish.push(fish);
-      el.addEventListener('pointerdown', e => { e.stopPropagation(); tankSel = tankSel === n ? null : n; render(); });
+      bindDrag(fish);
     });
     aq.addEventListener('pointerdown', () => { if (tankSel !== null) { tankSel = null; render(); } });
+
     const place = f => {
-      const bob = f.kind === 'swim' || f.kind === 'float' ? Math.sin(f.phase) * (f.kind === 'float' ? 2 : 3) : 0;
+      const bob = !f.drag && (f.kind === 'swim' || f.kind === 'float') ? Math.sin(f.phase) * (f.kind === 'float' ? 2 : 3) : 0;
       // 이모지 물고기는 대부분 왼쪽을 본다 → 오른쪽으로 갈 때 뒤집는다
       f.el.style.transform = `translate(${f.x}px, ${f.y + bob}px) scaleX(${f.vx > 0 ? -1 : 1}) rotate(${f.rot}deg)`;
     };
+
+    // 잡동사니가 바닥에 자리 잡으면 가로 위치를 저장 (수조 너비가 달라도 맞도록 비율로)
+    function rememberSpot(f) {
+      if (f.kind !== 'sink' || !f.it) return;
+      f.it.pos = Math.round(Math.max(0, Math.min(1, f.x / Math.max(1, W - f.px))) * 1000) / 1000;
+      save();
+    }
+    // 놓은 뒤 어떻게 움직일지 정한다
+    function settle(f) {
+      if ((f.kind === 'sink' || f.kind === 'crawl') && f.y < floorY(f) - 1) { f.falling = true; f.vy = 0; }
+      else if (f.kind === 'float' && f.y > surfaceY + 1) { f.rising = true; f.vy = 0; }
+      else if (f.kind === 'swim') { f.ty = f.y; f.pause = 0.5; }
+      if (f.kind === 'sink' && !f.falling) rememberSpot(f);
+      if (reduceMotion) { // 움직임을 줄인 경우엔 바로 제자리로
+        if (f.falling) { f.y = floorY(f); f.falling = false; f.rot = f.restRot; rememberSpot(f); }
+        if (f.rising) { f.y = surfaceY; f.rising = false; }
+        place(f);
+      }
+    }
+
+    // 끌어서 옮기기. 조금만 움직였으면 탭으로 보고 정보 카드를 연다
+    function bindDrag(f) {
+      const el = f.el;
+      let start = null;
+      el.addEventListener('pointerdown', e => {
+        e.stopPropagation(); e.preventDefault();
+        start = { cx: e.clientX, cy: e.clientY, x: f.x, y: f.y, moved: false };
+        try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      });
+      el.addEventListener('pointermove', e => {
+        if (!start) return;
+        const dx = e.clientX - start.cx, dy = e.clientY - start.cy;
+        if (!start.moved && Math.hypot(dx, dy) < 6) return;
+        if (!start.moved) { start.moved = true; f.drag = true; f.falling = f.rising = false; el.classList.add('dragging'); }
+        f.x = Math.max(0, Math.min(W - f.px, start.x + dx));
+        f.y = Math.max(surfaceY, Math.min(floorY(f), start.y + dy));
+        if (f.kind === 'sink') f.rot = f.restRot * 0.3;
+        place(f);
+      });
+      const end = e => {
+        if (!start) return;
+        const moved = start.moved; start = null;
+        try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+        el.classList.remove('dragging');
+        if (moved) { f.drag = false; settle(f); }
+        else if (e.type === 'pointerup') { tankSel = tankSel === f.n ? null : f.n; render(); }
+      };
+      el.addEventListener('pointerup', end);
+      el.addEventListener('pointercancel', end);
+    }
+
     aquaFish.forEach(place);
     if (reduceMotion) return;
     let last = performance.now();
@@ -1433,8 +1565,26 @@ ${info}` },
     const tick = now => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
       for (const f of aquaFish) {
-        if (f.kind === 'sink') continue;
+        if (f.drag) continue;
         f.phase += dt * 2;
+        // 가라앉기: 천천히 가속, 좌우로 살랑이며
+        if (f.falling) {
+          f.vy = Math.min(f.vy + 50 * dt, f.kind === 'sink' ? 42 : 55);
+          f.y += f.vy * dt;
+          f.rot = f.restRot + Math.sin(f.phase * 1.6) * 10;
+          f.x = Math.max(0, Math.min(W - f.px, f.x + Math.sin(f.phase * 1.3) * 6 * dt));
+          if (f.y >= floorY(f)) { f.y = floorY(f); f.falling = false; f.vy = 0; f.rot = f.restRot; rememberSpot(f); }
+          place(f); continue;
+        }
+        // 떠오르기: 둥실둥실
+        if (f.rising) {
+          f.vy = Math.min(f.vy + 40 * dt, 34);
+          f.y -= f.vy * dt;
+          f.rot = Math.sin(f.phase * 1.4) * 6;
+          if (f.y <= surfaceY) { f.y = surfaceY; f.rising = false; f.vy = 0; f.rot = 0; }
+          place(f); continue;
+        }
+        if (f.kind === 'sink') continue;
         if (f.pause > 0) { f.pause -= dt; place(f); continue; }
         f.x += f.vx * dt;
         if (f.x < 2) { f.x = 2; f.vx = Math.abs(f.vx); }
@@ -1678,7 +1828,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.1.3 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.2.0 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
