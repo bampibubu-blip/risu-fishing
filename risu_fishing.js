@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.1.2
+//@version 1.1.3
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.1.2 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.1.3 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -696,12 +696,17 @@ ${info}` },
   // ─────────────────────────────── 물고기 그림 ───────────────────────────────
   // 이미지가 준비되면 image_base 폴더에 '<지역>_<번호 두 자리>.png'로 올리면 된다 (예: fantasy_01.png).
   // 불러오지 못한 그림은 자동으로 이모지로 돌아간다.
-  const DEFAULT_ART_BASE = 'https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/fish';
-  let ART_BASE = DEFAULT_ART_BASE;
+  // 기본 그림은 CDN(jsDelivr)에서 먼저 받고, 안 되면 GitHub에서 받는다
+  const DEFAULT_ART_BASES = [
+    'https://cdn.jsdelivr.net/gh/bampibubu-blip/risu-fishing@main/fish',
+    'https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/fish',
+  ];
+  const ART_TIMEOUT = 5000; // 이 시간 안에 안 뜨면 다음 주소로
+  let ART_BASES = DEFAULT_ART_BASES;
   async function loadArtBase() {
     let v = '';
     try { v = String((await Risuai.getArgument('image_base')) || '').trim().replace(/\/+$/, ''); } catch (_) {}
-    ART_BASE = !v ? DEFAULT_ART_BASE : /^(none|off|emoji|0)$/i.test(v) ? '' : v;
+    ART_BASES = !v ? DEFAULT_ART_BASES : /^(none|off|emoji|0)$/i.test(v) ? [] : [v];
   }
   const artFile = key => {
     if (!key || key.startsWith('sig:')) return null; // 고유종은 이미지가 없다
@@ -714,15 +719,41 @@ ${info}` },
       const sg = state.sigs[key.slice(4)];
       return sg?.img ? { src: sg.img, flip: !!sg.flip } : null;
     }
-    const file = ART_BASE && artFile(key);
-    return file ? { src: ART_BASE + '/' + file, flip: false } : null;
+    const file = ART_BASES.length && artFile(key);
+    if (!file) return null;
+    const srcs = ART_BASES.map(b => b + '/' + file).filter(u => !deadArt.has(u.slice(0, u.lastIndexOf('/'))));
+    return srcs.length ? { src: srcs[0], alt: srcs.slice(1), flip: false } : null;
   }
   function art(key, emoji) {
     const a = artSrc(key);
     return a
-      ? `<img class="art${a.flip ? ' flip' : ''}" src="${esc(a.src)}" alt="" data-emo="${esc(emoji)}" draggable="false">`
+      ? `<img class="art${a.flip ? ' flip' : ''}" src="${esc(a.src)}" alt="" data-emo="${esc(emoji)}" data-alt="${esc((a.alt || []).join('|'))}" draggable="false">`
       : `<span class="emo">${emoji}</span>`;
   }
+  // 응답이 없거나 실패한 그림 서버는 기억해 두고 이번 세션 동안 건너뛴다
+  const deadArt = new Set();
+  const baseOf = u => u.slice(0, u.lastIndexOf('/'));
+  function artFallback(img) {
+    if (!img.isConnected || img.dataset.done) return;
+    const alts = (img.dataset.alt || '').split('|').filter(Boolean);
+    if (/^https?:/.test(img.src)) {
+      const failed = baseOf(img.src);
+      // 같은 서버의 다른 그림이 이미 떴다면 이 파일만 없는 것 → 서버는 살려 둔다
+      if (!document.querySelector(`img.art[data-done="1"][src^="${failed}/"]`)) deadArt.add(failed);
+    }
+    if (alts.length) { img.dataset.alt = alts.slice(1).join('|'); img.dataset.t = Date.now(); img.src = alts[0]; return; }
+    const sp = document.createElement('span'); sp.className = 'emo'; sp.textContent = img.dataset.emo || '🐟'; img.replaceWith(sp);
+  }
+  document.addEventListener('load', e => { if (e.target?.tagName === 'IMG' && e.target.classList.contains('art')) e.target.dataset.done = '1'; }, true);
+  // 일정 시간 안에 안 뜨는 그림은 실패로 보고 다음 주소로
+  setInterval(() => {
+    const now = Date.now();
+    document.querySelectorAll('img.art:not([data-done])').forEach(img => {
+      if (img.complete && img.naturalWidth > 0) { img.dataset.done = '1'; return; }
+      if (!img.dataset.t) { img.dataset.t = now; return; }
+      if (now - img.dataset.t > ART_TIMEOUT) artFallback(img);
+    });
+  }, 1000);
 
   // 고유종 그림 올리기: 정사각형 192px 안에 맞춰 줄이고 투명 배경 유지
   async function imageToDataUrl(file) {
@@ -737,12 +768,10 @@ ${info}` },
       return webp.startsWith('data:image/webp') ? webp : cv.toDataURL('image/png');
     } finally { URL.revokeObjectURL(url); }
   }
-  // 이미지 로딩 실패 → 이모지로 교체
+  // 이미지 로딩 실패 → 다음 주소, 다 안 되면 이모지
   document.addEventListener('error', e => {
     const img = e.target;
-    if (img && img.tagName === 'IMG' && img.classList.contains('art')) {
-      const sp = document.createElement('span'); sp.className = 'emo'; sp.textContent = img.dataset.emo || '🐟'; img.replaceWith(sp);
-    }
+    if (img && img.tagName === 'IMG' && img.classList.contains('art')) artFallback(img);
   }, true);
   const keyOfIdx = (rid, i) => `${rid}:${i}`;
 
@@ -1466,11 +1495,17 @@ ${info}` },
 
   // ── 어탁: 물고기 카드를 PNG로 저장
   function loadImg(src) {
-    return new Promise(res => { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+    return new Promise(res => {
+      const im = new Image(); im.crossOrigin = 'anonymous';
+      const t = setTimeout(() => res(null), ART_TIMEOUT);
+      im.onload = () => { clearTimeout(t); res(im); }; im.onerror = () => { clearTimeout(t); res(null); };
+      im.src = src;
+    });
   }
   async function saveGyotaku(it) {
     const as = artSrc(it.k);
-    const img = as ? await loadImg(as.src) : null;
+    let img = null;
+    if (as) for (const u of [as.src, ...(as.alt || [])]) { img = await loadImg(u); if (img) break; }
     const info = itemInfo(it); if (!info) return;
     const { r, f, tier } = info, t = TIERS[tier];
     const W = 720, H = 960, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
@@ -1643,7 +1678,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.1.2 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.1.3 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
