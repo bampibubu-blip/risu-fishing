@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.2.1
+//@version 1.2.2
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.2.1 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.2.2 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -217,9 +217,9 @@
     { id: 'golden',   name: '반짝이는 것',      title: '황금손',        hint: '아주 드물게 빛나는 개체가 있어요',   desc: '황금 개체를 낚았어요',                    test: s => s.counters.golden >= 1 },
     { id: 'fake',     name: '헛손질',           title: '잘 속는 사람',  hint: '속는 것도 경험이에요',               desc: '가짜 입질에 10번 속았어요',               test: s => s.counters.fake >= 10 },
     { id: 'cast100',  name: '손목 단련',        title: '백 번 던진 사람', hint: '많이 던져보세요',                  desc: '낚싯대를 100번 던졌어요',                 test: s => s.counters.casts >= 100 },
-    { id: 'translate',name: '통역사의 손목',    title: '통역사',        hint: '번역 기능을 아주 많이',              desc: '번역을 1,000번 받았어요',                 test: s => s.counters.translate >= 1000 },
-    { id: 'memory',   name: '기억의 정원사',    title: '기억의 정원사', hint: '긴 이야기는 요약이 필요해요',        desc: '메모리 요약을 100번 받았어요',            test: s => s.counters.memory >= 100 },
-    { id: 'emotion',  name: '감정 해독가',      title: '감정 해독가',   hint: '감정을 읽는 기능을 써보세요',        desc: '감정 판별을 500번 받았어요',              test: s => s.counters.emotion >= 500 },
+    { id: 'helper',   name: '든든한 조수',      title: '든든한 조수',   hint: '번역, 요약 같은 보조 기능을 아주 많이', desc: '보조 모델 응답을 모두 합쳐 1,000번 받았어요', test: s => AUX_KEYS.reduce((n, k) => n + (s.counters[k] || 0), 0) >= 1000 },
+    { id: 'world',    name: '세계 일주',        title: '방랑 낚시꾼',   hint: '여러 세계의 물을 맛보세요',          desc: '8개 지역에서 모두 물고기를 낚았어요',     test: s => REGIONS.every(r => r.fish.some((_, i) => s.dex[`${r.id}:${i}`])) },
+    { id: 'fulltank', name: '만선',             title: '만선의 선장',   hint: '수조를 넓히고 가득',                 desc: '50칸 이상인 수조를 가득 채웠어요',        test: s => s.tankCap >= 50 && s.tank.length >= s.tankCap },
     { id: 'rich',     name: '미끼 부자',        title: '미끼 부자',     hint: '미끼를 아껴 모아보세요',             desc: '미끼를 500개 모았어요',                   test: s => s.bait >= 500 },
     { id: 'owl',      name: '올빼미',           title: '올빼미',        hint: '모두가 잠든 시간',                   desc: '새벽 3시에서 5시 사이에 답변을 받았어요', test: s => s.counters.mainNight >= 1 },
     { id: 'longchat', name: '장기 연애',        title: '한 우물 파는 사람', hint: '한 채팅방에서 오래오래',         desc: '한 채팅방에서 500턴을 넘겼어요',          test: s => s.counters.maxTurns >= 500 },
@@ -231,8 +231,14 @@
     { id: 'deja',     name: '데자뷰',           title: '데자뷰',        hidden: true, desc: '같은 물고기를 3번 연속으로 낚았어요', test: s => s.counters.sameStreakMax >= 3 },
     { id: 'midnight', name: '자정의 낚시꾼',    title: '자정의 낚시꾼', hidden: true, desc: '밤 12시 정각에 낚싯대를 던졌어요',  test: s => s.counters.midnight >= 1 },
     { id: 'nobait',   name: '빈손 낚시',        title: '빈손 낚시꾼',   hidden: true, desc: '미끼 없이 던지기를 10번 눌렀어요', test: s => s.counters.emptyTaps >= 10 },
+    // 더 이상 새로 얻을 수 없는 업적. 이미 달성한 사람에게만 보이고 칭호도 그대로 쓸 수 있다.
+    { id: 'translate', retired: true, name: '통역사의 손목',    title: '통역사',        hint: '번역 기능을 아주 많이',              desc: '번역을 1,000번 받았어요',                 test: s => s.counters.translate >= 1000 },
+    { id: 'emotion', retired: true,  name: '감정 해독가',      title: '감정 해독가',   hint: '감정을 읽는 기능을 써보세요',        desc: '감정 판별을 500번 받았어요',              test: s => s.counters.emotion >= 500 },
+    { id: 'memory', retired: true, name: '기억의 정원사',    title: '기억의 정원사', hint: '긴 이야기는 요약이 필요해요',        desc: '메모리 요약을 100번 받았어요',            test: s => s.counters.memory >= 100 },
   ];
   const ACH_BY_ID = Object.fromEntries(ACHIEVEMENTS.map(a => [a.id, a]));
+  const ACH_ACTIVE = ACHIEVEMENTS.filter(a => !a.retired);
+  const AUX_KEYS = ['translate', 'memory', 'emotion', 'otherAx', 'submodel'];
   const achReward = a => a.hidden ? 50 : 20;
 
   // ── 상점
@@ -244,6 +250,7 @@
   ];
   const CHUM = { cost: 30, uses: 5, mult: 1.5 };     // 떡밥: 5회 동안 희귀·전설 확률 1.5배
   const TICKET_COST = 20;                            // 지역 이동권
+  const FEEDER_COST = 50;                            // 먹이통: 한 번 사면 계속 쓴다
   const TANK_STEP = 10, TANK_MAX = 100;              // 수조 확장
   const tankCost = cap => 40 + (cap - 30) * 2;
   const SHOP_TITLES = [
@@ -288,7 +295,7 @@
     },
     regions: {},   // chaId -> { r, name }
     dex: {},       // "regionId:idx" -> { n, best, g }
-    settings: { sound: true, vibrate: true },
+    settings: { sound: true, vibrate: true, dark: null, notify: true }, // dark: null이면 기기 설정을 따름
     ach: {},        // 업적 id -> 달성 시각
     unseen: [],     // 아직 알림을 못 본 업적
     title: null,    // 장착한 칭호(업적 id)
@@ -296,13 +303,16 @@
     shells: 0,
     tank: [],       // { k:'지역:번호', s:크기, g:황금, i:이세계, t:시각, c:캐릭터 이름 }
     tankCap: 30,
-    gear: { rod: 0, chum: 0, tickets: 1, rerolls: 0 },
+    gear: { rod: 0, chum: 0, tickets: 1, rerolls: 0, feeder: false }, // feeder: 먹이통(영구)
     shopTitles: [],
     achPaid: {},    // 조개 보상을 이미 받은 업적
     charCasts: {},  // 캐릭터별 던진 횟수
     sigs: {},       // 캐릭터 id -> 고유종 { emoji, name, desc, min, max, charName, region, at }
     sigDex: {},     // 'sig:캐릭터 id' -> { n, best, g }
     sigTry: {},     // 캐릭터 id -> { st, n, err } 마지막 생성 시도
+    skip: { best: 0, throws: 0, day: '', dayShells: 0 }, // 물수제비 기록
+    swim: { best: 0, plays: 0, day: '', dayShells: 0, pick: null }, // 헤엄치기 기록, pick: 고른 물고기의 t
+    fed: 0,         // 먹이 준 횟수
     createdAt: Date.now(),
   });
 
@@ -332,6 +342,8 @@
       sigs: s.sigs || {},
       sigDex: s.sigDex || {},
       sigTry: s.sigTry || {},
+      skip: { ...d.skip, ...(s.skip || {}) },
+      swim: { ...d.swim, ...(s.swim || {}) },
     };
   }
 
@@ -348,7 +360,7 @@
   let visible = false;
   function checkAch() {
     const got = [];
-    for (const a of ACHIEVEMENTS) {
+    for (const a of ACH_ACTIVE) {
       if (state.ach[a.id]) continue;
       let ok = false;
       try { ok = a.test(state); } catch (_) {}
@@ -410,6 +422,7 @@
 
   const onChatOutput = async ({ chat, messageIndex }) => {
     try {
+      if (visible && state.settings.notify !== false) showArrive();
       state.counters.main += 1;
       state.bait += BAIT_MAIN;
       refreshHud();
@@ -699,6 +712,9 @@ ${info}` },
     bite: () => beep([880, 1320], 0.07, 'square'),
     win:  () => beep([523, 659, 784, 1047], 0.1),
     fail: () => beep([300, 220, 160], 0.12, 'sawtooth'),
+    skip: () => beep([1200], 0.04, 'sine'),
+    plop: () => beep([260, 180], 0.08, 'sine'),
+    ping: () => beep([784, 1047], 0.09, 'sine'),
   };
   function buzz(p) { if (state.settings.vibrate) try { navigator.vibrate?.(p); } catch (_) {} }
 
@@ -809,7 +825,11 @@ ${info}` },
     dream: 'M0 90 Q30 72 60 84 Q90 70 120 84 Q150 76 170 90 Z M240 90 Q270 74 300 82 Q330 68 360 82 Q385 74 400 80 L400 90 Z M296 82 L296 72 L290 72 L302 62 L314 72 L308 72 L308 82 Z',
   };
   function sceneSVG(r) {
-    const sky = tint(r.water[0], .2), far = shade(sky, .88), w = r.water[1];
+    const dk = isDark();
+    // 어두운 테마: 해 질 녘처럼 물빛을 낮춘 색. 하늘보다 물이 조금 밝아 시선이 수면에 간다
+    const sky = dk ? shade(r.water[1], .34) : tint(r.water[0], .2);
+    const far = dk ? shade(r.water[1], .24) : shade(sky, .88);
+    const w = dk ? shade(r.water[1], .5) : r.water[1];
     // 물결 경계를 가진 띠: 아래로 갈수록 진하고 물결이 크다
     const band = (y, amp, per, color) => {
       let d = `M0 ${y}`;
@@ -834,13 +854,38 @@ ${info}` },
     :root{
       --paper:#f8fafb; --card:#ffffff; --ink:#22313f; --muted:#6a7886; --line:#dfe5ea; --wash:#eef2f5;
       --float:#d9432f; --focus:#2f6fd0;
+      --pri:#22313f; --on-pri:#ffffff; --holding:#a8321f; --dim:#b7c0c9;
+      --backdrop:rgba(34,49,63,.28); --shadow:rgba(34,49,63,.22); --glass:rgba(255,255,255,.85); --veil:rgba(248,250,251,.35);
+      --notice-bg:#fff4e0; --notice-fg:#7a4a00; --zone:#cfe8d6; --toast-sub:#c5ced8;
+      --new-bg:#fde7e3; --new-fg:#a12b1b; --gold-bg:#fbf0d2; --gold-fg:#7a5600;
+      --tog-off:#cdd5dc; --knob:#ffffff; --foam:rgba(255,255,255,.9); --stone:#8b9096; --pellet:#b0763c; --coral:#e39a86; --hook:#5d6670; --line-fish:rgba(60,70,80,.45);
+      --aq-top:#e4f3f7; --aq-mid:#b7dbe6; --aq-bot:#a5cfdc; --aq-frame:#d5dde3; --sand-a:#e6dcc4; --sand-b:#d8cba9; --weed:#6fa58a; --aq-text:#4b6573;
+      color-scheme:light;
     }
+    /* 어두운 테마: 순검정 대신 푸른 기가 도는 짙은 회색, 글자도 순백 대신 약간 낮춘 밝기 */
+    :root.dark{
+      --paper:#1b2026; --card:#232930; --ink:#d3dae0; --muted:#8a96a1; --line:#323a43; --wash:#2a3139;
+      --float:#c9644f; --focus:#6f9fdc;
+      --pri:#3b4f5f; --on-pri:#e4eaee; --holding:#8f4636; --dim:#4c5661;
+      --backdrop:rgba(0,0,0,.5); --shadow:rgba(0,0,0,.45); --glass:rgba(35,41,48,.88); --veil:rgba(10,14,18,.4);
+      --notice-bg:#3a3021; --notice-fg:#e2c48e; --zone:#2f4a3a; --toast-sub:#9aa7b2;
+      --new-bg:#4a2a25; --new-fg:#f0a99c; --gold-bg:#433820; --gold-fg:#e6cc86;
+      --tog-off:#3a434d; --knob:#c9d1d8; --foam:rgba(210,222,230,.65); --stone:#c3c8cd; --pellet:#c48a50; --coral:#b8705f; --hook:#c4ccd3; --line-fish:rgba(220,228,234,.45);
+      --aq-top:#4a7584; --aq-mid:#3e6877; --aq-bot:#365f6d; --aq-frame:#3a444e; --sand-a:#7d745d; --sand-b:#6d6550; --weed:#5f9b7f; --aq-text:#dbe6eb;
+      color-scheme:dark;
+    }
+    :root.dark img.art{filter:brightness(.94)}
+    :root.dark .card .tier{filter:brightness(1.4)}
+    :root.dark .aqua{box-shadow:none}
+    :root.dark .aq-light{opacity:.6}
+    :root.dark .aq-sand{border-top-color:rgba(255,255,255,.08)}
+    :root.dark .aq-bub{border-color:rgba(200,215,225,.5)}
     *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-    html,body{height:100%;background:rgba(34,49,63,.28);font-family:Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;color:var(--ink);overflow:hidden;font-size:15px;line-height:1.5}
+    html,body{height:100%;background:var(--backdrop);font-family:Pretendard,'Apple SD Gothic Neo','Noto Sans KR','Malgun Gothic',system-ui,sans-serif;color:var(--ink);overflow:hidden;font-size:15px;line-height:1.5}
     button{font:inherit;color:inherit}
     :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
     #app{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px}
-    .panel{position:relative;width:100%;max-width:420px;height:100%;max-height:720px;background:var(--paper);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(34,49,63,.22)}
+    .panel{position:relative;width:100%;max-width:420px;height:100%;max-height:720px;background:var(--paper);border-radius:14px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px var(--shadow)}
     header{display:flex;align-items:baseline;gap:12px;padding:16px 16px 10px}
     header .title{font-size:17px;font-weight:700;flex:1;letter-spacing:-.01em}
     .bait{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -850,7 +895,7 @@ ${info}` },
     nav button{background:none;border:none;color:var(--muted);padding:8px 0 10px;font-size:15px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
     nav button.on{color:var(--ink);font-weight:600;border-bottom-color:var(--ink)}
     main{flex:1;overflow:auto;position:relative}
-    .notice{margin:12px 16px 0;padding:10px 12px;border-radius:8px;background:#fff4e0;color:#7a4a00;font-size:13px}
+    .notice{margin:12px 16px 0;padding:10px 12px;border-radius:8px;background:var(--notice-bg);color:var(--notice-fg);font-size:13px}
     .spot{padding:14px 16px 0;font-size:14px;color:var(--muted)}
     .spot b{color:var(--ink);font-weight:600}
     .spot .new{color:var(--float)}
@@ -865,53 +910,53 @@ ${info}` },
     .bobber.drop{display:block;animation:drop .42s cubic-bezier(.5,0,1,1)}
     @keyframes drop{from{transform:translate(-30px,-150px) scale(.7)}to{transform:none}}
     .splash{position:absolute;left:50%;top:58%;width:0;height:0;pointer-events:none}
-    .splash i{position:absolute;left:-4px;top:0;width:8px;height:9px;border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;background:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.4);animation:drip .6s cubic-bezier(.2,.6,.4,1) forwards}
+    .splash i{position:absolute;left:-4px;top:0;width:8px;height:9px;border-radius:50% 50% 50% 50% / 40% 40% 60% 60%;background:var(--foam);animation:drip .6s cubic-bezier(.2,.6,.4,1) forwards}
     @keyframes drip{0%{transform:translate(0,0) scale(.6)}45%{transform:translate(calc(var(--dx)*.6),var(--dy)) scale(1)}100%{transform:translate(var(--dx),6px) scale(.4);opacity:0}}
-    .splash b{position:absolute;left:-34px;top:4px;width:68px;height:18px;border:2px solid rgba(255,255,255,.9);border-radius:50%;animation:splashring .7s ease-out forwards}
+    .splash b{position:absolute;left:-34px;top:4px;width:68px;height:18px;border:2px solid var(--foam);border-radius:50%;animation:splashring .7s ease-out forwards}
     @keyframes splashring{from{transform:scale(.2);opacity:1}to{transform:scale(1.5);opacity:0}}
-    .bobber{position:absolute;left:50%;top:58%;width:16px;height:24px;margin:-12px 0 0 -8px;border-radius:50% 50% 45% 45%;background:linear-gradient(var(--float) 0 48%,#fff 48%);box-shadow:0 1px 0 rgba(34,49,63,.25);display:none}
+    .bobber{position:absolute;left:50%;top:58%;width:16px;height:24px;margin:-12px 0 0 -8px;border-radius:50% 50% 45% 45%;background:linear-gradient(var(--float) 0 48%,var(--knob) 48%);box-shadow:0 1px 0 rgba(34,49,63,.25);display:none}
     .bobber.idle,.bobber.fake,.bobber.bite{display:block}
     .bobber.idle{animation:bob 2.4s ease-in-out infinite}
     .bobber.fake{animation:twitch .35s ease-in-out}
     .bobber.bite{animation:dip .28s ease-in-out infinite}
-    .ring{position:absolute;left:50%;top:58%;width:60px;height:18px;margin:-2px 0 0 -30px;border:1.5px solid rgba(255,255,255,.85);border-radius:50%;opacity:0}
+    .ring{position:absolute;left:50%;top:58%;width:60px;height:18px;margin:-2px 0 0 -30px;border:1.5px solid var(--foam);border-radius:50%;opacity:0}
     .ring.on{animation:ring .7s ease-out infinite}
     @keyframes bob{50%{transform:translateY(3px)}}
     @keyframes twitch{30%{transform:translate(-2px,3px)}70%{transform:translate(2px,2px)}}
     @keyframes dip{50%{transform:translateY(12px)}}
     @keyframes ring{from{transform:scale(.4);opacity:1}to{transform:scale(1.6);opacity:0}}
-    .msg{position:absolute;left:12px;right:12px;bottom:12px;text-align:center;font-size:14px;color:var(--ink);background:rgba(255,255,255,.82);border-radius:8px;padding:8px 10px}
+    .msg{position:absolute;left:12px;right:12px;bottom:12px;text-align:center;font-size:14px;color:var(--ink);background:var(--glass);border-radius:8px;padding:8px 10px}
     .msg:empty{display:none}
-    .act{display:block;width:calc(100% - 32px);margin:0 16px 16px;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;color:#fff;background:var(--ink);cursor:pointer;touch-action:manipulation}
+    .act{display:block;width:calc(100% - 32px);margin:0 16px 16px;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:700;color:var(--on-pri);background:var(--pri);cursor:pointer;touch-action:manipulation}
     .act.off{background:var(--wash);color:var(--muted);cursor:default}
     .act.reel{background:var(--float)}
-    .act.holding{background:#a8321f}
+    .act.holding{background:var(--holding)}
     header .title small{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-top:1px}
-    .reelbox{position:absolute;left:12px;right:12px;top:12px;background:rgba(255,255,255,.9);border-radius:8px;padding:10px 12px;display:none}
+    .reelbox{position:absolute;left:12px;right:12px;top:12px;background:var(--glass);border-radius:8px;padding:10px 12px;display:none}
     .reelbox.on{display:block}
     .reelbox .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
     .track{position:relative;height:14px;background:var(--wash);border-radius:3px;overflow:hidden}
-    .track .zone{position:absolute;top:0;bottom:0;background:#cfe8d6}
+    .track .zone{position:absolute;top:0;bottom:0;background:var(--zone)}
     .track .needle{position:absolute;top:-2px;bottom:-2px;width:3px;margin-left:-1px;background:var(--ink);border-radius:1px}
     .track.danger .needle{background:var(--float)}
     .prog{height:6px;background:var(--wash);border-radius:3px;margin-top:8px;overflow:hidden}
     .prog i{display:block;height:100%;width:0;background:var(--ink)}
     .toasts{position:absolute;left:16px;right:16px;bottom:84px;display:flex;flex-direction:column;gap:6px;pointer-events:none;z-index:5}
-    .toast{background:var(--ink);color:#fff;border-radius:8px;padding:10px 12px;font-size:14px;box-shadow:0 6px 18px rgba(34,49,63,.25);animation:lift .2s ease-out}
-    .toast small{display:block;color:#c5ced8;font-size:12px}
+    .toast{background:var(--pri);color:var(--on-pri);border-radius:8px;padding:10px 12px;font-size:14px;box-shadow:0 6px 18px var(--shadow);animation:lift .2s ease-out}
+    .toast small{display:block;color:var(--toast-sub);font-size:12px}
     .achs{padding:4px 16px 16px}
     .ach{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line)}
-    .ach .mark{flex:none;width:28px;height:28px;border-radius:50%;background:var(--wash);color:#b7c0c9;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
-    .ach.got .mark{background:var(--ink);color:#fff}
+    .ach .mark{flex:none;width:28px;height:28px;border-radius:50%;background:var(--wash);color:var(--dim);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+    .ach.got .mark{background:var(--pri);color:var(--on-pri)}
     .ach .body{flex:1;min-width:0}
     .ach .nm{font-size:15px;font-weight:600}
     .ach:not(.got) .nm{color:var(--muted)}
     .ach .ds{font-size:13px;color:var(--muted)}
     .ach .eq{flex:none;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:13px;cursor:pointer}
-    .ach .eq.on{background:var(--ink);border-color:var(--ink);color:#fff}
+    .ach .eq.on{background:var(--pri);border-color:var(--pri);color:var(--on-pri)}
     .act.hit{background:var(--float)}
-    .card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(248,250,251,.35)}
-    .card .inner{width:100%;background:var(--card);border-radius:10px;padding:20px 18px 16px;box-shadow:0 6px 24px rgba(34,49,63,.18);animation:lift .2s ease-out}
+    .card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;background:var(--veil)}
+    .card .inner{width:100%;background:var(--card);border-radius:10px;padding:20px 18px 16px;box-shadow:0 6px 24px var(--shadow);animation:lift .2s ease-out}
     @keyframes lift{from{transform:translateY(8px);opacity:0}}
     .card .top{display:flex;align-items:center;gap:14px}
     .card .em{font-size:52px;line-height:1}
@@ -922,7 +967,7 @@ ${info}` },
     .card .ds{color:var(--muted);font-size:14px}
     .tags{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
     .tag{font-size:12px;padding:3px 8px;border-radius:4px;background:var(--wash);color:var(--ink)}
-    .tag.new{background:#fde7e3;color:#a12b1b}.tag.gold{background:#fbf0d2;color:#7a5600}
+    .tag.new{background:var(--new-bg);color:var(--new-fg)}.tag.gold{background:var(--gold-bg);color:var(--gold-fg)}
     .card .hint{margin-top:14px;font-size:12px;color:var(--muted)}
     .summary{padding:16px 16px 4px;display:flex;align-items:baseline;gap:8px}
     .summary .n{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
@@ -936,7 +981,7 @@ ${info}` },
     .cell.un{background:var(--wash);border-color:transparent;border-top-color:var(--c)}
     .cell.sel{border-color:var(--ink);border-top-color:var(--c)}
     .cell .em{font-size:28px;line-height:1.2}
-    .cell.un .em{color:#b7c0c9;font-size:22px;line-height:34px;font-weight:700}
+    .cell.un .em{color:var(--dim);font-size:22px;line-height:34px;font-weight:700}
     .cell .nm{font-size:12px;margin-top:4px;line-height:1.3;word-break:keep-all}
     .cell .meta{font-size:11px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
     .detail{margin:0 16px 16px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;font-size:14px}
@@ -947,9 +992,9 @@ ${info}` },
     .row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px}
     .row span:last-child{font-variant-numeric:tabular-nums}
     .row.total{border-top:1px solid var(--line);margin-top:4px;padding-top:8px;font-weight:600}
-    .tog{width:42px;height:24px;border-radius:12px;background:#cdd5dc;border:none;position:relative;cursor:pointer;flex:none}
-    .tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s}
-    .tog.on{background:var(--ink)}.tog.on::after{left:21px}
+    .tog{width:42px;height:24px;border-radius:12px;background:var(--tog-off);border:none;position:relative;cursor:pointer;flex:none}
+    .tog::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--knob);transition:left .15s}
+    .tog.on{background:var(--pri)}.tog.on::after{left:21px}
     .btn{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:9px 14px;font-size:14px;cursor:pointer;margin:4px 6px 0 0}
     .link{background:none;border:none;color:var(--muted);text-decoration:underline;text-underline-offset:2px;font-size:13px;cursor:pointer;margin-left:4px}
     .picker{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 0}
@@ -959,7 +1004,7 @@ ${info}` },
     header .link{margin-left:0;font-size:14px;text-decoration:none}
     header .link.on{color:var(--ink);font-weight:600}
     .cardacts{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:14px}
-    .btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+    .btn.pri{background:var(--pri);border-color:var(--pri);color:var(--on-pri)}
     .btn.sm{padding:6px 10px;font-size:13px;margin:0;flex:none}
     .btn.dim{color:var(--muted)}
     .cardacts .btn{margin:0}
@@ -988,11 +1033,11 @@ ${info}` },
     .tankhead{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0}
     .seg{display:flex;background:var(--wash);border-radius:8px;padding:3px}
     .seg button{background:none;border:none;padding:5px 12px;border-radius:6px;font-size:13px;color:var(--muted);cursor:pointer}
-    .seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(34,49,63,.12)}
-    .aqua{position:relative;margin:12px 16px 0;height:320px;border-radius:6px;overflow:hidden;background:linear-gradient(#e4f3f7,#b7dbe6 70%,#a5cfdc);border:6px solid #d5dde3;border-top-width:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
+    .seg button.on{background:var(--card);color:var(--ink);font-weight:600;box-shadow:0 1px 2px var(--shadow)}
+    .aqua{position:relative;margin:12px 16px 0;height:320px;border-radius:6px;overflow:hidden;background:linear-gradient(var(--aq-top),var(--aq-mid) 70%,var(--aq-bot));border:6px solid var(--aq-frame);border-top-width:10px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6)}
     .aq-light{position:absolute;inset:0;background:repeating-linear-gradient(100deg,rgba(255,255,255,.18) 0 18px,transparent 18px 70px);mix-blend-mode:soft-light;pointer-events:none}
-    .aq-sand{position:absolute;left:0;right:0;bottom:0;height:26px;background:linear-gradient(#e6dcc4,#d8cba9);border-top:1px solid rgba(255,255,255,.5)}
-    .aq-weed{position:absolute;left:0;right:0;bottom:18px;width:100%;height:120px;fill:none;stroke:#6fa58a;stroke-width:5;stroke-linecap:round;opacity:.75;pointer-events:none}
+    .aq-sand{position:absolute;left:0;right:0;bottom:0;height:26px;background:linear-gradient(var(--sand-a),var(--sand-b));border-top:1px solid rgba(255,255,255,.5)}
+    .aq-weed{position:absolute;left:0;right:0;bottom:18px;width:100%;height:120px;fill:none;stroke:var(--weed);stroke-width:5;stroke-linecap:round;opacity:.75;pointer-events:none}
     .aq-bub{position:absolute;bottom:26px;width:6px;height:6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85);animation:bub 4s linear infinite;pointer-events:none}
     .aq-bub.b2{animation-duration:5.5s;animation-delay:1.7s}
     @keyframes bub{from{transform:translateY(0);opacity:0}10%{opacity:1}to{transform:translateY(-290px);opacity:.2}}
@@ -1002,7 +1047,7 @@ ${info}` },
     .fishy .body{display:block;filter:drop-shadow(0 2px 1px rgba(34,49,63,.15))}
     .fishy.gold .body{filter:sepia(1) saturate(3) hue-rotate(-12deg) drop-shadow(0 0 4px rgba(255,214,90,.9))}
     .fishy.sel::after{content:'';position:absolute;left:50%;bottom:-9px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--ink)}
-    .aq-empty{position:absolute;left:16px;right:16px;top:42%;text-align:center;color:#4b6573;font-size:14px}
+    .aq-empty{position:absolute;left:16px;right:16px;top:42%;text-align:center;color:var(--aq-text);font-size:14px}
     .fishcard{display:flex;gap:12px;margin:10px 16px 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:8px}
     .fishcard .em{font-size:40px;line-height:1;flex:none}
     .fishcard .em.gold{filter:sepia(1) saturate(3) hue-rotate(-12deg)}
@@ -1010,6 +1055,43 @@ ${info}` },
     .fishcard .nm{font-size:15px;font-weight:600}
     .fishcard .ds{font-size:13px;color:var(--muted)}
     .fishcard .acts{display:flex;align-items:center;gap:10px;margin-top:8px}
+    .arrive{display:flex;align-items:center;gap:8px;margin:10px 16px 0;padding:9px 10px 9px 12px;border-radius:8px;background:var(--pri);color:var(--on-pri);font-size:14px;animation:lift .2s ease-out}
+    .arrive span{flex:1}
+    .arrive button{background:none;border:1px solid currentColor;border-radius:6px;padding:4px 10px;font-size:13px;cursor:pointer;color:inherit}
+    .arrive button.x2{border:none;padding:4px 6px;opacity:.75}
+    .pellet{position:absolute;left:0;top:0;width:5px;height:5px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--pellet);pointer-events:none}
+    .yum{position:absolute;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:1.5px solid var(--foam);pointer-events:none;animation:yum .5s ease-out forwards}
+    @keyframes yum{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
+    .skipbox{position:relative;margin:10px 16px 12px;height:300px;border-radius:10px;overflow:hidden;user-select:none;touch-action:manipulation}
+    .skipbox .scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+    .stone{position:absolute;left:0;top:0;width:22px;height:9px;margin:-4px 0 0 -11px;border-radius:50%;background:var(--stone);box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);will-change:transform}
+    .skipring{position:absolute;left:0;top:0;width:40px;height:10px;margin:-5px 0 0 -20px;border:1.5px solid var(--foam);border-radius:50%;pointer-events:none;animation:splashring .7s ease-out forwards}
+    .skipcount{position:absolute;left:0;right:0;top:14px;text-align:center;font-size:34px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;pointer-events:none}
+    .gauges{position:absolute;left:12px;right:12px;bottom:12px;background:var(--glass);border-radius:8px;padding:10px 12px;transition:opacity .2s}
+    .gauges.hide{opacity:0;pointer-events:none}
+    .gauges .lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:4px}
+    .gauges .track{margin-bottom:8px}.gauges .track:last-child{margin-bottom:0}
+    .gauges .track.done{opacity:.55}
+    .feeder{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;font-size:13px;color:var(--muted);cursor:pointer}
+    .feeder.on{background:var(--pri);border-color:var(--pri);color:var(--on-pri);font-weight:600}
+    .aqua.feeding{cursor:crosshair}
+    .swimbox{position:relative;margin:10px 16px 12px;height:300px;border-radius:10px;overflow:hidden;user-select:none;touch-action:manipulation;background:linear-gradient(var(--aq-top),var(--aq-mid) 70%,var(--aq-bot));cursor:pointer}
+    .sw-sand{position:absolute;left:0;right:0;bottom:0;height:22px;background:linear-gradient(var(--sand-a),var(--sand-b))}
+    .sw-layer{position:absolute;inset:0;pointer-events:none}
+    .sw-pipe{position:absolute;left:0;top:0;bottom:22px;width:46px;will-change:transform}
+    .sw-line{position:absolute;left:22px;top:0;width:2.5px;background:var(--line-fish)}
+    .sw-line i{position:absolute;left:-8px;bottom:-16px;width:14px;height:18px;border:3px solid var(--hook);border-top:none;border-radius:0 0 8px 8px;border-left-color:transparent}
+    .sw-coral{position:absolute;left:6px;right:6px;bottom:0;border-radius:16px 16px 0 0;background:var(--coral);box-shadow:inset -6px 0 0 rgba(0,0,0,.08)}
+    .sw-player{position:absolute;left:0;top:0;font-size:34px;line-height:1;width:34px;height:34px;display:flex;align-items:center;justify-content:center;pointer-events:none;will-change:transform}
+    .sw-player.gold .body{filter:sepia(1) saturate(3) hue-rotate(-12deg) drop-shadow(0 0 4px rgba(255,214,90,.9))}
+    .sw-player img.art{width:1em;height:1em}
+    .swpicks{display:flex;gap:6px;overflow-x:auto;padding:6px 16px 0;scrollbar-width:none}
+    .swpicks button{flex:none;width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .swpicks button.on{border-color:var(--ink);border-width:2px}
+    .swpicks img.art{width:1em;height:1em;object-fit:contain}
+    .swpicks button.gold img.art{filter:sepia(1) saturate(3) hue-rotate(-12deg)}
+    .skipstats{display:flex;gap:16px;padding:12px 16px 0;font-size:14px;color:var(--muted)}
+    .skipstats b{color:var(--ink);font-variant-numeric:tabular-nums}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>`;
   document.body.innerHTML = `<div id="app"></div>`;
@@ -1030,14 +1112,23 @@ ${info}` },
     if (btn && !fishing && !btn.classList.contains('reel')) btn.classList.toggle('off', state.bait <= 0);
   }
 
+  // 어두운 테마: 직접 고른 값이 없으면 기기(RisuAI 쪽 브라우저) 설정을 따른다
+  const sysDark = () => { try { return matchMedia('(prefers-color-scheme: dark)').matches; } catch (_) { return false; } };
+  const isDark = () => typeof state.settings.dark === 'boolean' ? state.settings.dark : sysDark();
+  const applyTheme = () => document.documentElement.classList.toggle('dark', isDark());
+
   function render() {
     cancelAnimationFrame(aquaRaf);
+    stopSkip(); stopSwim();
+    applyTheme();
     app.innerHTML = `<div class="panel">
       <header><span class="title">리스 낚시터${titleName(state.title) ? `<small>${esc(titleName(state.title))}</small>` : ''}</span><span class="bait" id="bait">${hudBait()}</span><button class="link ${tab === 'set' ? 'on' : ''}" id="toset">설정</button><button class="x" id="close" aria-label="닫기">✕</button></header>
-      <nav>${[['fish','낚시'],['tank','수조'],['dex','도감'],['shop','상점'],['ach','업적']].map(([k,l]) => `<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('')}</nav>
-      <main id="main"></main><div class="toasts" id="toasts"></div></div>`;
+      <nav>${[['fish','낚시'],['play','쉼터'],['tank','수조'],['dex','도감'],['shop','상점'],['ach','업적']].map(([k,l]) => `<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('')}</nav>
+      <div id="arrive"></div><main id="main"></main><div class="toasts" id="toasts"></div></div>`;
+    paintArrive();
     document.getElementById('close').onclick = close;
     document.getElementById('toset').onclick = () => { if (fishing) cancelFishing(); resolvePending(); tab = 'set'; render(); };
+    app.querySelector('nav').style.gap = '16px';
     app.querySelectorAll('nav button').forEach(b => b.onclick = () => { if (fishing) cancelFishing(); resolvePending(); tab = b.dataset.tab; render(); });
     const main = document.getElementById('main');
     if (tab === 'fish') renderFish(main);
@@ -1045,9 +1136,301 @@ ${info}` },
     else if (tab === 'ach') renderAch(main);
     else if (tab === 'tank') renderTank(main);
     else if (tab === 'shop') renderShop(main);
+    else if (tab === 'play') renderPlay(main);
     else renderSettings(main);
     const onReg = main.querySelector('.regions button.on');
     if (onReg) onReg.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
+
+  // ── 답변 도착 알림: 출력을 기다리며 놀다가 답변이 오면 위에 띠를 띄운다
+  let arrived = false;
+  function showArrive() {
+    arrived = true; paintArrive();
+    sfx.ping(); buzz([20, 60, 20]);
+  }
+  function paintArrive() {
+    const el = document.getElementById('arrive'); if (!el) return;
+    el.innerHTML = arrived ? `<div class="arrive" role="status"><span>답변이 도착했어요</span><button id="arrgo">채팅으로</button><button class="x2" id="arrx" aria-label="알림 닫기">✕</button></div>` : '';
+    if (!arrived) return;
+    document.getElementById('arrgo').onclick = () => { arrived = false; close(); };
+    document.getElementById('arrx').onclick = () => { arrived = false; paintArrive(); };
+  }
+
+  // ── 쉼터: 물수제비
+  // 1) 흔들리는 각도 바늘을 눌러 멈추고  2) 누르고 있다가 떼서 세기를 정한다
+  // 각도는 20° 근처일수록, 세기는 셀수록 많이 튄다. 수평선 쪽으로 날아가며 점점 작아진다.
+  const SKIP_DAY_CAP = 10;            // 하루에 물수제비로 받을 수 있는 조개
+  const SKIP_PAY_AT = 5;              // 이만큼 튀기면 조개 1개
+  let skip = null;                    // { phase, t0, angle, power, raf, timers }
+  const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+  function stopSkip() {
+    if (!skip) return;
+    cancelAnimationFrame(skip.raf); skip.timers.forEach(clearTimeout); skip = null;
+  }
+  let playMode = 'skip';
+  const playSeg = () => `<div class="tankhead" style="padding-top:12px"><span class="spot" style="padding:0">${playMode === 'skip' ? '돌을 수평선까지' : '낚싯바늘을 피해서'}</span>
+    <div class="seg"><button class="${playMode === 'skip' ? 'on' : ''}" data-pm="skip">물수제비</button><button class="${playMode === 'swim' ? 'on' : ''}" data-pm="swim">헤엄치기</button></div></div>`;
+  function bindPlaySeg(main) { main.querySelectorAll('[data-pm]').forEach(b => b.onclick = () => { playMode = b.dataset.pm; render(); }); }
+  function renderPlay(main) {
+    if (playMode === 'swim') { renderSwim(main); bindPlaySeg(main); return; }
+    const r = REGION_BY_ID[spot.regionId];
+    const k = state.skip;
+    if (k.day !== todayKey()) { k.day = todayKey(); k.dayShells = 0; }
+    main.innerHTML = `
+      ${playSeg()}
+      <div class="skipbox" id="skipbox">
+        ${sceneSVG(r)}
+        <div class="skipcount" id="skipcount"></div>
+        <div class="stone" id="stone" style="display:none"></div>
+        <div class="gauges" id="gauges">
+          <div class="lbl"><span>각도</span><span>20° 근처가 잘 튀어요</span></div>
+          <div class="track" id="gA"><div class="zone" style="left:${(14 / 45) * 100}%;width:${(12 / 45) * 100}%"></div><div class="needle" id="nA"></div></div>
+          <div class="lbl"><span>세기</span><span id="skiptip">누르면 각도가 멈춰요</span></div>
+          <div class="track" id="gP"><div class="zone" style="left:85%;width:15%"></div><div class="needle" id="nP"></div></div>
+        </div>
+      </div>
+      <button class="act" id="skipact">각도 정하기</button>
+      <div class="skipstats"><span>최고 <b>${k.best}</b>번</span><span>던진 돌 <b>${k.throws}</b>개</span><span>오늘 받은 조개 <b>${k.dayShells}</b>/${SKIP_DAY_CAP}</span></div>
+      <p class="shopnote" style="padding-top:8px">${SKIP_PAY_AT}번 넘게 튀기면 조개 1개. 미끼는 쓰지 않아요. 상점에서 먹이통을 사면 수조 물고기에게 먹이를 줄 수 있어요.</p>`;
+    const act = document.getElementById('skipact'), box = document.getElementById('skipbox');
+    const down = e => { e.preventDefault(); skipDown(); };
+    act.addEventListener('pointerdown', down); box.addEventListener('pointerdown', down);
+    for (const el of [act, box]) for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) el.addEventListener(ev, skipUp);
+    bindPlaySeg(main);
+    skipReady();
+  }
+
+  // ── 쉼터: 헤엄치기 (플래피 버드 방식)
+  // 누를 때마다 위로 헤엄치고, 위에서 내려오는 낚싯줄과 아래에서 올라온 산호 사이를 빠져나간다.
+  const SWIM_DAY_CAP = 10, SWIM_PAY_EVERY = 5;   // 5점마다 조개 1개, 하루 10개까지
+  let swim = null;
+  function stopSwim() { if (swim) { cancelAnimationFrame(swim.raf); swim = null; } }
+  function swimPicks() {
+    return state.tank.map(it => ({ it, info: itemInfo(it) })).filter(x => x.info);
+  }
+  function renderSwim(main) {
+    const k = state.swim;
+    if (k.day !== todayKey()) { k.day = todayKey(); k.dayShells = 0; }
+    const picks = swimPicks();
+    const cur = picks.find(x => x.it.t === k.pick) || picks[picks.length - 1] || null;
+    main.innerHTML = `
+      ${playSeg()}
+      <div class="swimbox" id="swimbox">
+        <div class="aq-light"></div><div class="sw-sand"></div>
+        <div class="sw-layer" id="swlayer"></div>
+        <div class="sw-player ${cur?.it.g ? 'gold' : ''}" id="swp"><span class="body">${cur ? art(cur.it.k, cur.info.f[0]) : '🐟'}</span></div>
+        <div class="skipcount" id="swscore"></div>
+        <div class="msg" id="swmsg">누르면 위로 헤엄쳐요. 낚싯바늘과 산호를 피하세요.</div>
+      </div>
+      <button class="act" id="swact">시작</button>
+      <div class="skipstats"><span>최고 <b id="swbest">${k.best}</b>점</span><span>오늘 받은 조개 <b id="swday">${k.dayShells}</b>/${SWIM_DAY_CAP}</span></div>
+      ${picks.length > 1 ? `<div class="pickhint">함께 헤엄칠 물고기</div><div class="swpicks">${picks.slice().reverse().map(x => `<button class="${x === cur ? 'on' : ''} ${x.it.g ? 'gold' : ''}" data-pick="${x.it.t}" aria-label="${esc(x.info.f[1])}">${art(x.it.k, x.info.f[0])}</button>`).join('')}</div>` : ''}
+      <p class="shopnote" style="padding-top:8px">${picks.length ? '' : '수조에 물고기를 넣으면 그 물고기로 헤엄칠 수 있어요. '}${SWIM_PAY_EVERY}점마다 조개 1개. 미끼는 쓰지 않아요.</p>`;
+    main.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { if (swim?.on) return; k.pick = +b.dataset.pick; save(); render(); });
+    const box = document.getElementById('swimbox'), act = document.getElementById('swact');
+    const tap = e => { e.preventDefault(); swimTap(); };
+    box.addEventListener('pointerdown', tap); act.addEventListener('pointerdown', tap);
+    swimReset();
+  }
+  function swimReset() {
+    stopSwim();
+    const box = document.getElementById('swimbox'); if (!box) return;
+    swim = { on: false, over: false, y: box.clientHeight * 0.45, vy: 0, pipes: [], score: 0, dist: 0, raf: 0, overAt: 0, last: 0 };
+    document.getElementById('swlayer').innerHTML = '';
+    swimDraw();
+  }
+  const SW = { g: 1100, flap: -330, speed: 130, gap: 118, pw: 46, every: 190, size: 34 };
+  function swimTap() {
+    if (!swim) return;
+    if (swim.over) { if (performance.now() - swim.overAt > 450) { swimReset(); swimTap(); } return; }
+    if (!swim.on) {
+      swim.on = true; swim.last = performance.now();
+      document.getElementById('swmsg').textContent = '';
+      const a = document.getElementById('swact'); if (a) { a.textContent = '헤엄치기'; a.className = 'act reel'; }
+      document.getElementById('swscore').textContent = '0';
+      swim.raf = requestAnimationFrame(swimTick);
+    }
+    swim.vy = SW.flap; sfx.skip();
+  }
+  function swimTick(now) {
+    if (!swim || !swim.on) return;
+    const box = document.getElementById('swimbox'); if (!box) return stopSwim();
+    const W = box.clientWidth, H = box.clientHeight, floor = H - 22;
+    const dt = Math.min(0.033, (now - swim.last) / 1000); swim.last = now;
+    swim.vy = Math.min(swim.vy + SW.g * dt, 520);
+    swim.y += swim.vy * dt;
+    swim.dist += SW.speed * dt;
+    // 기둥 만들기: 위는 낚싯줄+바늘, 아래는 산호
+    const lastX = swim.pipes.length ? swim.pipes[swim.pipes.length - 1].x : -Infinity;
+    if (lastX < W - SW.every) {
+      const gapY = 40 + Math.random() * (floor - 80 - SW.gap);
+      const el = document.createElement('div'); el.className = 'sw-pipe';
+      el.innerHTML = `<div class="sw-line" style="height:${gapY}px"><i></i></div><div class="sw-coral" style="top:${gapY + SW.gap}px"></div>`;
+      document.getElementById('swlayer').appendChild(el);
+      swim.pipes.push({ x: Math.max(W, lastX + SW.every), gapY, el, passed: false });
+    }
+    const px = W * 0.28, r = SW.size * 0.36;
+    let hit = swim.y - r < 0 || swim.y + r > floor;
+    for (const p of swim.pipes) {
+      p.x -= SW.speed * dt;
+      p.el.style.transform = `translateX(${p.x}px)`;
+      // 원과 사각형 충돌 (낚싯줄은 가늘지만 바늘 쪽까지 넉넉히 기둥으로 본다)
+      // 위: 낚싯줄과 바늘(가운데 좁은 폭), 아래: 산호(기둥 폭)
+      const lineHit = px + r > p.x + SW.pw / 2 - 8 && px - r < p.x + SW.pw / 2 + 8 && swim.y - r < p.gapY + 14;
+      const coralHit = px + r > p.x + 6 && px - r < p.x + SW.pw - 6 && swim.y + r > p.gapY + SW.gap;
+      if (lineHit || coralHit) hit = true;
+      if (!p.passed && p.x + SW.pw < px - r) {
+        p.passed = true; swim.score += 1;
+        document.getElementById('swscore').textContent = swim.score; buzz(6);
+      }
+    }
+    while (swim.pipes.length && swim.pipes[0].x < -SW.pw - 10) swim.pipes.shift().el.remove();
+    swimDraw();
+    if (hit) return swimOver();
+    swim.raf = requestAnimationFrame(swimTick);
+  }
+  function swimDraw() {
+    const el = document.getElementById('swp'), box = document.getElementById('swimbox'); if (!el || !box || !swim) return;
+    const rot = Math.max(-25, Math.min(60, swim.vy / 8));
+    el.style.transform = `translate(${box.clientWidth * 0.28 - SW.size / 2}px, ${swim.y - SW.size / 2}px) scaleX(-1) rotate(${-rot}deg)`;
+  }
+  function swimOver() {
+    swim.on = false; swim.over = true; swim.overAt = performance.now();
+    cancelAnimationFrame(swim.raf);
+    const k = state.swim, n = swim.score;
+    if (k.day !== todayKey()) { k.day = todayKey(); k.dayShells = 0; }
+    k.plays += 1;
+    const best = n > k.best; if (best) k.best = n;
+    const earn = Math.min(Math.floor(n / SWIM_PAY_EVERY), SWIM_DAY_CAP - k.dayShells);
+    if (earn > 0) { k.dayShells += earn; addShells(earn); }
+    save(); refreshHud();
+    sfx.plop(); buzz([30, 40, 30]);
+    if (best && n) setTimeout(() => sfx.win(), 200);
+    const m = document.getElementById('swmsg');
+    if (m) m.textContent = `${n}점${best && n ? ', 최고 기록이에요' : ''}${earn > 0 ? `. 조개 ${earn}개를 받았어요` : n >= SWIM_PAY_EVERY && k.dayShells >= SWIM_DAY_CAP ? '. 오늘 받을 조개는 다 받았어요' : ''}`;
+    const a = document.getElementById('swact'); if (a) { a.textContent = '다시 하기'; a.className = 'act'; }
+    const b = document.getElementById('swbest'); if (b) b.textContent = k.best;
+    const d = document.getElementById('swday'); if (d) d.textContent = k.dayShells;
+    checkAch();
+  }
+  // 바늘 위치: 0~1 사이를 왕복 (삼각파)
+  const tri = (t, period) => { const x = (t / period) % 1; return x < .5 ? x * 2 : 2 - x * 2; };
+  function skipReady() {
+    stopSkip();
+    skip = { phase: 'angle', t0: performance.now(), angle: 0, power: 0, raf: 0, timers: [] };
+    const nA = document.getElementById('nA'), nP = document.getElementById('nP');
+    document.getElementById('gA')?.classList.remove('done'); document.getElementById('gP')?.classList.remove('done');
+    document.getElementById('gauges')?.classList.remove('hide');
+    const cnt0 = document.getElementById('skipcount'); if (cnt0) cnt0.textContent = '';
+    if (nP) nP.style.left = '0%';
+    const loop = now => {
+      if (!skip) return;
+      if (skip.phase === 'angle') { skip.angle = tri(now - skip.t0, 1600) * 45; if (nA) nA.style.left = (skip.angle / 45 * 100) + '%'; }
+      if (skip.phase === 'charge') { skip.power = tri(now - skip.t0, 1400); if (nP) nP.style.left = (skip.power * 100) + '%'; }
+      if (skip.phase === 'angle' || skip.phase === 'charge' || skip.phase === 'power') skip.raf = requestAnimationFrame(loop);
+    };
+    skip.raf = requestAnimationFrame(loop);
+    const a = document.getElementById('skipact'); if (a) { a.textContent = '각도 정하기'; a.className = 'act'; }
+    const tip = document.getElementById('skiptip'); if (tip) tip.textContent = '누르면 각도가 멈춰요';
+  }
+  function skipDown() {
+    if (!skip) return;
+    if (skip.phase === 'angle') {
+      skip.phase = 'power';
+      document.getElementById('gA')?.classList.add('done');
+      const a = document.getElementById('skipact'); if (a) { a.textContent = '누르고 있다가 떼서 던지기'; a.className = 'act reel'; }
+      const tip = document.getElementById('skiptip'); if (tip) tip.textContent = '누르고 있으면 세기가 오르내려요';
+      return;
+    }
+    if (skip.phase === 'power') {
+      skip.phase = 'charge'; skip.t0 = performance.now();
+      const a = document.getElementById('skipact'); if (a) a.className = 'act reel holding';
+      cancelAnimationFrame(skip.raf);
+      const nP = document.getElementById('nP');
+      const loop = now => { if (skip?.phase !== 'charge') return; skip.power = tri(now - skip.t0, 1400); if (nP) nP.style.left = (skip.power * 100) + '%'; skip.raf = requestAnimationFrame(loop); };
+      skip.raf = requestAnimationFrame(loop);
+      return;
+    }
+    if (skip.phase === 'done') skipReady();
+  }
+  function skipUp() {
+    if (skip?.phase !== 'charge') return;
+    cancelAnimationFrame(skip.raf);
+    skip.phase = 'fly';
+    document.getElementById('gP')?.classList.add('done');
+    document.getElementById('gauges')?.classList.add('hide');
+    const a = document.getElementById('skipact'); if (a) { a.textContent = '날아가는 중'; a.className = 'act off'; }
+    throwStone(skip.angle, skip.power);
+  }
+  function skipCountFor(angle, power) {
+    if (angle > 40) return 0;                                   // 너무 세워 던지면 퐁당
+    const af = Math.max(0, 1 - Math.abs(angle - 20) / 22);      // 20°에서 1
+    const n = Math.round(power * af * 14 + (Math.random() * 2 - 1));
+    return Math.max(0, Math.min(16, n));
+  }
+  function throwStone(angle, power) {
+    const n = skipCountFor(angle, power);
+    const box = document.getElementById('skipbox'), stone = document.getElementById('stone'), cnt = document.getElementById('skipcount');
+    if (!box || !stone) return;
+    const W = box.clientWidth, H = box.clientHeight;
+    // 거리 t(0=발밑, 1=수평선) → 화면 좌표. 수평선은 높이의 30% 지점
+    const horizon = H * 0.3;
+    const toXY = t => ({ x: W * (0.5 + 0.08 * Math.sin(t * 2.2)), y: H - 18 - t * (H - 18 - horizon - 6), s: 1 - t * 0.82 });
+    // 튈 때마다 간격이 줄어든다
+    const pts = [0]; let gap = 0.13 + power * 0.05, t = 0;
+    for (let i = 0; i <= n; i++) { t += gap; pts.push(Math.min(0.97, t)); gap *= 0.84; }
+    const hop = i => (i === 0 ? 70 : 34 * Math.pow(0.8, i)) * (0.5 + power * 0.5); // 공중 높이(px)
+    { const p0 = toXY(0); stone.style.transform = `translate(${p0.x}px, ${p0.y}px)`; }
+    stone.style.display = 'block'; cnt.textContent = '';
+    const segDur = i => (i === 0 ? 420 : Math.max(140, 300 * Math.pow(0.88, i)));
+    let i = 0, segStart = performance.now();
+    sfx.cast();
+    const ring = (p, big) => {
+      if (reduceMotion) return;
+      const r = document.createElement('div'); r.className = 'skipring';
+      r.style.transform = `translate(${p.x}px, ${p.y}px) scale(${p.s * (big ? 1.6 : 1)})`;
+      box.appendChild(r); setTimeout(() => r.remove(), 750);
+    };
+    const step = now => {
+      if (!skip || skip.phase !== 'fly') return;
+      const a = pts[i], b = pts[i + 1], u = Math.min(1, (now - segStart) / segDur(i));
+      const p = toXY(a + (b - a) * u), lift = Math.sin(u * Math.PI) * hop(i) * p.s;
+      stone.style.transform = `translate(${p.x}px, ${p.y - lift}px) scale(${p.s}) rotate(${(now / 3) % 360}deg)`;
+      if (u >= 1) {
+        const at = toXY(b);
+        i += 1;
+        if (i >= pts.length - 1) { // 마지막 착수: 퐁당
+          ring(at, true); stone.style.display = 'none'; sfx.plop();
+          return finishSkip(n);
+        }
+        ring(at, false); sfx.skip(); buzz(8);
+        cnt.textContent = `${i}`;
+        segStart = now;
+      }
+      skip.raf = requestAnimationFrame(step);
+    };
+    if (reduceMotion) { cnt.textContent = `${n}`; stone.style.display = 'none'; return finishSkip(n); }
+    skip.raf = requestAnimationFrame(step);
+  }
+  function finishSkip(n) {
+    if (!skip) return;
+    skip.phase = 'done';
+    const k = state.skip;
+    if (k.day !== todayKey()) { k.day = todayKey(); k.dayShells = 0; }
+    k.throws += 1;
+    const best = n > k.best; if (best) k.best = n;
+    let paid = false;
+    if (n >= SKIP_PAY_AT && k.dayShells < SKIP_DAY_CAP) { k.dayShells += 1; addShells(1); paid = true; }
+    save(); refreshHud();
+    const cnt = document.getElementById('skipcount');
+    if (cnt) cnt.textContent = n ? `${n}번!` : '퐁당';
+    const tip = document.getElementById('skiptip');
+    if (tip) tip.textContent = best && n ? '최고 기록이에요' : paid ? '조개 1개를 받았어요' : n >= SKIP_PAY_AT ? '오늘 받을 조개는 다 받았어요' : n === 0 ? '조금 눕혀서 던져 보세요' : '';
+    if (best && n) sfx.win();
+    const a = document.getElementById('skipact'); if (a) { a.textContent = '한 번 더'; a.className = 'act'; }
+    const st = document.querySelector('.skipstats');
+    if (st) st.innerHTML = `<span>최고 <b>${k.best}</b>번</span><span>던진 돌 <b>${k.throws}</b>개</span><span>오늘 받은 조개 <b>${k.dayShells}</b>/${SKIP_DAY_CAP}</span>`;
+    checkAch();
   }
 
   // ── 낚시 화면
@@ -1332,7 +1715,7 @@ ${info}` },
     const chars = [...new Set([...live.map(id => state.sigs[id].charId || sigChar(id)), ...(spot.charId ? [spot.charId] : [])])];
     const sigRow = id => {
       const sg = state.sigs[id], d = state.sigDex['sig:' + id];
-      if (!d) return `<div class="titem"><div class="em" style="color:#b7c0c9;font-weight:700;font-size:20px">?</div><div class="body"><div class="nm" style="color:var(--muted)">${sigLabel(sg.stage)}</div>
+      if (!d) return `<div class="titem"><div class="em" style="color:var(--dim);font-weight:700;font-size:20px">?</div><div class="body"><div class="nm" style="color:var(--muted)">${sigLabel(sg.stage)}</div>
         <div class="ds">아직 못 낚았어요. 던질 때마다 ${Math.round(SIG_STAGES[(sg.stage || 1) - 1].rate * 1000) / 10}% 확률로 걸려요.</div></div></div>`;
       return `<div class="titem"><div class="em ${d.g ? 'gold' : ''}">${art('sig:' + id, sg.emoji)}</div><div class="body"><div class="nm">${esc(sg.name)} <span style="color:${TIERS[3].color};font-size:12px;font-weight:600">${sigLabel(sg.stage)}</span></div>
         <div class="ds">${esc(sg.desc)}<br>최고 기록 ${fmtSize(d.best)}, ${d.n}마리</div>
@@ -1423,7 +1806,7 @@ ${info}` },
     if (SWIM.has(e) || emoji === '🐉' || emoji === '🐲') return 'swim';
     return 'sink';
   }
-  let tankView = 'aqua', tankSel = null, aquaRaf = 0, aquaFish = [];
+  let tankView = 'aqua', tankSel = null, aquaRaf = 0, aquaFish = [], aquaPellets = [], feedMode = false;
   const reduceMotion = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (_) { return false; } })();
 
   function renderTank(main) {
@@ -1432,9 +1815,10 @@ ${info}` },
     const sel = tankSel !== null ? items.find(x => x.n === tankSel) : null;
     main.innerHTML = `
       <div class="tankhead"><div class="summary" style="padding:0"><span class="n">${state.tank.length}</span><span class="of">/ ${state.tankCap}칸</span></div>
-        <div class="seg"><button class="${tankView === 'aqua' ? 'on' : ''}" data-v="aqua">수조</button><button class="${tankView === 'list' ? 'on' : ''}" data-v="list">목록</button></div></div>
+        <div style="display:flex;gap:8px;align-items:center">${state.gear.feeder && tankView === 'aqua' && items.length ? `<button class="feeder ${feedMode ? 'on' : ''}" id="feeder" aria-pressed="${feedMode}">먹이통</button>` : ''}
+        <div class="seg"><button class="${tankView === 'aqua' ? 'on' : ''}" data-v="aqua">수조</button><button class="${tankView === 'list' ? 'on' : ''}" data-v="list">목록</button></div></div></div>
       ${tankView === 'aqua' ? `
-        <div class="aqua" id="aqua">
+        <div class="aqua ${feedMode ? 'feeding' : ''}" id="aqua">
           <div class="aq-light"></div>
           <svg class="aq-weed" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
             <path d="M40 120 C30 90 52 70 38 40 C30 22 44 10 40 0" /><path d="M58 120 C66 96 50 80 62 56" />
@@ -1450,7 +1834,7 @@ ${info}` },
             <div class="ds">${fmtSize(sel.it.s)}. ${esc(sel.info.f[4])}</div>
             <div class="ds">${esc(sel.info.r.name)}${sel.it.c ? `, ${esc(sel.it.c)}와 낚음` : ''}</div>
             <div class="acts"><button class="btn sm" data-sell="${sel.n}">팔기, 조개 ${priceOf(sel.it)}개</button><button class="link" data-img="${sel.n}">어탁 이미지 저장</button></div></div></div>`
-          : items.length ? `<p class="shopnote" style="padding-top:10px">물고기를 누르면 자세히 볼 수 있고, 끌어서 옮길 수도 있어요.</p>` : ''}`
+          : items.length ? `<p class="shopnote" style="padding-top:10px">${feedMode ? '빈 물을 누르면 먹이를 줘요. 먹이통을 다시 누르면 그만 줘요.' : `물고기를 누르면 자세히 볼 수 있고, 끌어서 옮길 수도 있어요.${state.gear.feeder ? '' : ' 상점에서 먹이통을 사면 먹이를 줄 수 있어요.'}`}</p>` : ''}`
       : (items.length ? `<div class="tanklist">${items.slice().reverse().map(({ it, n, info }) => `
         <div class="titem"><div class="em ${it.g ? 'gold' : ''}">${art(it.k, info.f[0])}</div>
           <div class="body"><div class="nm">${it.g ? '황금 ' : ''}${esc(info.f[1])} <span style="color:${TIERS[info.tier].color};font-size:12px;font-weight:600">${info.sig ? sigLabel(info.stage) : TIERS[info.tier].label}</span></div>
@@ -1458,7 +1842,9 @@ ${info}` },
           <button class="link" data-img="${n}">이미지</button><button class="btn sm" data-sell="${n}">팔기 ${priceOf(it)}</button></div>`).join('')}</div>`
         : `<div class="empty">수조가 비어 있어요.</div>`)}
       ${commons.length ? `<div style="padding:4px 16px 16px"><button class="btn" id="sellcommon">일반 등급 모두 팔기 (${commons.length}마리, 조개 ${commons.reduce((a, it) => a + priceOf(it), 0)}개)</button></div>` : ''}`;
-    main.querySelectorAll('.seg button').forEach(b => b.onclick = () => { tankView = b.dataset.v; tankSel = null; render(); });
+    main.querySelectorAll('.seg button').forEach(b => b.onclick = () => { tankView = b.dataset.v; tankSel = null; feedMode = false; render(); });
+    const fd = document.getElementById('feeder');
+    if (fd) fd.onclick = () => { feedMode = !feedMode; tankSel = null; render(); };
     main.querySelectorAll('[data-sell]').forEach(b => b.onclick = () => {
       const [it] = state.tank.splice(+b.dataset.sell, 1); sellItem(it); tankSel = null; render();
     });
@@ -1502,7 +1888,57 @@ ${info}` },
       aquaFish.push(fish);
       bindDrag(fish);
     });
-    aq.addEventListener('pointerdown', () => { if (tankSel !== null) { tankSel = null; render(); } });
+    // 빈 물을 누르면 먹이. 물고기를 고른 상태였다면 먼저 선택만 푼다
+    aquaPellets = [];
+    aq.addEventListener('pointerdown', e => {
+      if (!feedMode) { if (tankSel !== null) { tankSel = null; render(); } return; }
+      if (!items.length) return;
+      const rc = aq.getBoundingClientRect();
+      const x0 = e.clientX - rc.left - aq.clientLeft, y0 = Math.max(4, Math.min(H - SAND - 6, e.clientY - rc.top - aq.clientTop));
+      for (let i = 0; i < 3; i++) {
+        if (aquaPellets.length >= 24) break;
+        const el = document.createElement('div'); el.className = 'pellet'; aq.appendChild(el);
+        const p = { el, x: Math.max(4, Math.min(W - 4, x0 + (i - 1) * 7 + (Math.random() * 4 - 2))), y: y0 + Math.random() * 4, vy: 10 + Math.random() * 6, life: 8, landed: false };
+        aquaPellets.push(p); el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      }
+      state.fed = (state.fed || 0) + 1; save();
+    });
+    const eat = (f, p) => {
+      p.el.remove(); aquaPellets = aquaPellets.filter(q => q !== p);
+      const y = document.createElement('div'); y.className = 'yum'; y.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      aq.appendChild(y); setTimeout(() => y.remove(), 550);
+      f.pause = 0.4;
+    };
+    // 먹이를 향해 움직이면 true
+    const chase = (f, dt) => {
+      if (!aquaPellets.length || f.falling || f.rising) return false;
+      const cx = f.x + f.px / 2, cy = f.y + f.px / 2;
+      let best = null, bd = Infinity;
+      for (const p of aquaPellets) {
+        if ((f.kind === 'crawl' || f.kind === 'sink') && !p.landed) continue; // 바닥 생물·잡동사니는 바닥에 닿은 먹이만
+        if (f.kind === 'float' && p.y > 70) continue;             // 수면 생물은 위쪽 먹이만
+        const d = f.kind === 'swim' ? Math.hypot(p.x - cx, p.y - cy) : Math.abs(p.x - cx);
+        if (d < bd) { bd = d; best = p; }
+      }
+      if (!best || bd > (f.kind === 'swim' ? 220 : f.kind === 'sink' ? 130 : 160)) return false;
+      const reach = Math.max(8, f.px * 0.35);
+      if (bd < reach) { eat(f, best); if (f.kind === 'sink') { f.hop = 0; f.y = floorY(f); f.rot = f.restRot; rememberSpot(f); } return true; }
+      if (f.kind === 'sink') { // 콩콩: 뛰는 동안만 앞으로 간다
+        f.hop = (f.hop || 0) + dt * 3.2;
+        const u = f.hop % 1, dir = Math.sign(best.x - cx);
+        f.y = floorY(f) - Math.sin(u * Math.PI) * Math.min(14, f.px * 0.4);
+        if (u < .85) f.x = Math.max(0, Math.min(W - f.px, f.x + dir * 22 * dt));
+        f.rot = f.restRot * 0.4 + dir * Math.sin(u * Math.PI) * 10;
+        return true;
+      }
+      const sp = f.kind === 'swim' ? Math.max(40, Math.abs(f.vx) * 1.8) : f.kind === 'crawl' ? 16 : 18;
+      const dx = best.x - cx, dy = f.kind === 'swim' ? best.y - cy : 0, d = Math.hypot(dx, dy) || 1;
+      f.x = Math.max(0, Math.min(W - f.px, f.x + dx / d * sp * dt));
+      if (f.kind === 'swim') { f.y = Math.max(4, Math.min(H - SAND - f.px, f.y + dy / d * sp * dt)); f.ty = f.y; }
+      if (Math.abs(dx) > 2) f.vx = Math.sign(dx) * Math.abs(f.vx || sp);
+      f.pause = 0;
+      return true;
+    };
 
     const place = f => {
       const bob = !f.drag && (f.kind === 'swim' || f.kind === 'float') ? Math.sin(f.phase) * (f.kind === 'float' ? 2 : 3) : 0;
@@ -1566,8 +2002,16 @@ ${info}` },
     cancelAnimationFrame(aquaRaf);
     const tick = now => {
       const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      for (const p of aquaPellets.slice()) { // 먹이: 천천히 가라앉아 바닥에서 잠시 머문 뒤 사라진다
+        if (!p.landed) { p.y += p.vy * dt; p.x += Math.sin(now / 300 + p.vy) * 4 * dt; if (p.y >= H - SAND - 2) { p.y = H - SAND - 2; p.landed = true; } }
+        else { p.life -= dt; if (p.life < 1) p.el.style.opacity = Math.max(0, p.life); }
+        if (p.life <= 0) { p.el.remove(); aquaPellets = aquaPellets.filter(q => q !== p); continue; }
+        p.el.style.transform = `translate(${p.x}px, ${p.y}px)`;
+      }
       for (const f of aquaFish) {
         if (f.drag) continue;
+        if (!f.falling && !f.rising && chase(f, dt)) { f.phase += dt * 4; place(f); continue; }
+        if (f.kind === 'sink' && f.hop) { f.hop = 0; f.y = floorY(f); f.rot = f.restRot; rememberSpot(f); place(f); }
         f.phase += dt * 2;
         // 가라앉기: 천천히 가속, 좌우로 살랑이며
         if (f.falling) {
@@ -1616,6 +2060,7 @@ ${info}` },
         <h3>장비</h3>
         ${row(next ? next.name : ROD[rod].name, next ? `챔질 판정 시간 ${Math.round((next.win - 1) * 100)}% 늘림, 릴 감기 초록 구간 넓힘. 지금은 ${ROD[rod].name}` : '가장 좋은 낚싯대를 쓰고 있어요', next?.cost, 'rod', next ? '' : '최고 단계')}
         ${row('떡밥', `다음 ${CHUM.uses}번 던질 때 희귀·전설 확률 ${CHUM.mult}배. 남은 횟수 ${state.gear.chum}`, CHUM.cost, 'chum')}
+        ${row('먹이통', '수조에서 먹이통을 누른 채 빈 물을 누르면 먹이를 줘요. 한 번 사면 계속 써요', FEEDER_COST, 'feeder', state.gear.feeder ? '가지고 있음' : '')}
         ${row('지역 이동권', `캐릭터의 낚시터를 다른 지역으로 바꿀 때 써요. 가진 이동권 ${state.gear.tickets}장`, TICKET_COST, 'ticket')}
         ${row('고유종 다시 만들기권', `마음에 안 드는 고유종을 새로 만들어요. 도감의 고유종 탭에서 써요. 가진 권 ${state.gear.rerolls}장`, REROLL_COST, 'reroll')}
         ${row('수조 확장', state.tankCap < TANK_MAX ? `수조를 ${TANK_STEP}칸 넓혀요. 지금 ${state.tankCap}칸` : '수조가 가장 커요', tankCost(state.tankCap), 'tank', state.tankCap >= TANK_MAX ? `${TANK_MAX}칸` : '')}
@@ -1630,6 +2075,7 @@ ${info}` },
     if (id === 'rod') cost = ROD[state.gear.rod + 1]?.cost;
     else if (id === 'chum') cost = CHUM.cost;
     else if (id === 'ticket') cost = TICKET_COST;
+    else if (id === 'feeder') cost = state.gear.feeder ? null : FEEDER_COST;
     else if (id === 'reroll') cost = REROLL_COST;
     else if (id === 'tank') cost = state.tankCap < TANK_MAX ? tankCost(state.tankCap) : null;
     else if (id.startsWith('title:')) cost = SHOP_TITLES.find(t => 'title:' + t.id === id)?.cost;
@@ -1639,6 +2085,7 @@ ${info}` },
     if (id === 'rod') state.gear.rod += 1;
     else if (id === 'chum') state.gear.chum += CHUM.uses;
     else if (id === 'ticket') state.gear.tickets += 1;
+    else if (id === 'feeder') state.gear.feeder = true;
     else if (id === 'reroll') state.gear.rerolls += 1;
     else if (id === 'tank') state.tankCap += TANK_STEP;
     else state.shopTitles.push(id.slice(6));
@@ -1700,10 +2147,10 @@ ${info}` },
 
   // ── 업적 화면
   function renderAch(main) {
-    const got = ACHIEVEMENTS.filter(a => state.ach[a.id]).length;
+    const got = ACH_ACTIVE.filter(a => state.ach[a.id]).length;
     main.innerHTML = `
-      <div class="summary"><span class="n">${got}</span><span class="of">/ ${ACHIEVEMENTS.length}개 달성</span></div>
-      <div class="achs">${ACHIEVEMENTS.map(a => {
+      <div class="summary"><span class="n">${got}</span><span class="of">/ ${ACH_ACTIVE.length}개 달성</span></div>
+      <div class="achs">${ACHIEVEMENTS.filter(a => !a.retired || state.ach[a.id]).map(a => {
         const at = state.ach[a.id];
         if (!at && a.hidden) return `<div class="ach"><div class="mark">?</div><div class="body"><div class="nm">숨겨진 업적</div><div class="ds">조건은 달성하면 알 수 있어요</div></div></div>`;
         const d = at ? new Date(at) : null;
@@ -1740,7 +2187,9 @@ ${info}` },
     const c = state.counters;
     const aux = Object.keys(AUX_LABELS).reduce((a, k) => a + (c[k] || 0), 0);
     main.innerHTML = `
-      <div class="sec"><h3>소리와 진동</h3>
+      <div class="sec"><h3>화면과 소리</h3>
+        <div class="row"><span>어두운 테마${typeof state.settings.dark === 'boolean' ? '' : ' <small style="color:var(--muted)">(기기 설정 따름)</small>'}</span><button class="tog ${isDark() ? 'on' : ''}" data-k="dark"></button></div>
+        <div class="row"><span>답변이 오면 알려주기</span><button class="tog ${state.settings.notify !== false ? 'on' : ''}" data-k="notify"></button></div>
         <div class="row"><span>효과음</span><button class="tog ${state.settings.sound ? 'on' : ''}" data-k="sound"></button></div>
         <div class="row"><span>진동 (지원하는 기기만)</span><button class="tog ${state.settings.vibrate ? 'on' : ''}" data-k="vibrate"></button></div>
       </div>
@@ -1755,12 +2204,14 @@ ${info}` },
         <div class="row"><span>놓침 / 너무 일찍 / 가짜 입질</span><span>${c.miss} / ${c.early} / ${c.fake}</span></div>
         <div class="row"><span>황금 개체 / 이세계</span><span>${c.golden} / ${c.isekai}</span></div>
         <div class="row"><span>낚시한 캐릭터 수</span><span>${Object.keys(state.regions).length}</span></div>
+        <div class="row"><span>물수제비 최고 / 던진 돌</span><span>${state.skip.best} / ${state.skip.throws}</span></div>
+        <div class="row"><span>먹이 준 횟수</span><span>${state.fed || 0}</span></div>
       </div>
       <div class="sec" style="border:none"><h3>백업</h3><p>기기를 옮기거나 초기화하기 전에 기록을 파일로 저장해 두세요.</p>
         <button class="btn" id="exp">파일로 저장</button><button class="btn" id="imp">파일에서 불러오기</button>
         <input type="file" id="file" accept="application/json,.json" style="display:none">
       </div>`;
-    main.querySelectorAll('.tog').forEach(b => b.onclick = () => { const k = b.dataset.k; state.settings[k] = !state.settings[k]; save(); render(); });
+    main.querySelectorAll('.tog').forEach(b => b.onclick = () => { const k = b.dataset.k; state.settings[k] = k === 'dark' ? !isDark() : k === 'notify' ? state.settings.notify === false : !state.settings[k]; save(); render(); });
     document.getElementById('exp').onclick = exportJson;
     const file = document.getElementById('file');
     document.getElementById('imp').onclick = () => file.click();
@@ -1792,7 +2243,7 @@ ${info}` },
     tab = which;
     spot = await currentSpot();
     dexRegion = spot.regionId; dexDetail = null;
-    visible = true;
+    visible = true; arrived = false;
     render();
     await Risuai.showContainer('fullscreen');
     if (state.unseen.length) {
@@ -1801,8 +2252,9 @@ ${info}` },
     }
   }
   async function close() {
-    visible = false;
+    visible = false; arrived = false;
     cancelAnimationFrame(aquaRaf);
+    stopSkip(); stopSwim();
     clearFishing();
     resolvePending();
     clearTimeout(saveTimer);
@@ -1830,7 +2282,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.2.1 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.2.2 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
