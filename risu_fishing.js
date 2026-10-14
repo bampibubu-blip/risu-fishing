@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.2.2
+//@version 1.2.3
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.2.2 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.2.3 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -1158,7 +1158,7 @@ ${info}` },
 
   // ── 쉼터: 물수제비
   // 1) 흔들리는 각도 바늘을 눌러 멈추고  2) 누르고 있다가 떼서 세기를 정한다
-  // 각도는 20° 근처일수록, 세기는 셀수록 많이 튄다. 수평선 쪽으로 날아가며 점점 작아진다.
+  // 던질 때마다 초록 칸 위치·너비와 바늘 속도가 바뀐다. 두 바늘 모두 초록 칸에 가까울수록 많이 튄다.
   const SKIP_DAY_CAP = 10;            // 하루에 물수제비로 받을 수 있는 조개
   const SKIP_PAY_AT = 5;              // 이만큼 튀기면 조개 1개
   let skip = null;                    // { phase, t0, angle, power, raf, timers }
@@ -1183,10 +1183,10 @@ ${info}` },
         <div class="skipcount" id="skipcount"></div>
         <div class="stone" id="stone" style="display:none"></div>
         <div class="gauges" id="gauges">
-          <div class="lbl"><span>각도</span><span>20° 근처가 잘 튀어요</span></div>
-          <div class="track" id="gA"><div class="zone" style="left:${(14 / 45) * 100}%;width:${(12 / 45) * 100}%"></div><div class="needle" id="nA"></div></div>
+          <div class="lbl"><span>각도</span><span>초록 칸에 맞추면 잘 튀어요</span></div>
+          <div class="track" id="gA"><div class="zone" id="zA"></div><div class="needle" id="nA"></div></div>
           <div class="lbl"><span>세기</span><span id="skiptip">누르면 각도가 멈춰요</span></div>
-          <div class="track" id="gP"><div class="zone" style="left:85%;width:15%"></div><div class="needle" id="nP"></div></div>
+          <div class="track" id="gP"><div class="zone" id="zP"></div><div class="needle" id="nP"></div></div>
         </div>
       </div>
       <button class="act" id="skipact">각도 정하기</button>
@@ -1317,7 +1317,13 @@ ${info}` },
   const tri = (t, period) => { const x = (t / period) % 1; return x < .5 ? x * 2 : 2 - x * 2; };
   function skipReady() {
     stopSkip();
-    skip = { phase: 'angle', t0: performance.now(), angle: 0, power: 0, raf: 0, timers: [] };
+    const rnd = (a, b) => a + Math.random() * (b - a);
+    // 이번 판 설정: 각도 초록 칸(도), 세기 초록 칸(0~1), 바늘 왕복 시간(ms)
+    const cfg = { aC: rnd(10, 34), aW: rnd(5, 10), aP: rnd(700, 1500), pC: rnd(.35, .9), pW: rnd(.07, .14), pP: rnd(600, 1200) };
+    skip = { phase: 'angle', t0: performance.now(), angle: 0, power: 0, raf: 0, timers: [], cfg };
+    const zA = document.getElementById('zA'), zP = document.getElementById('zP');
+    if (zA) { zA.style.left = ((cfg.aC - cfg.aW / 2) / 45 * 100) + '%'; zA.style.width = (cfg.aW / 45 * 100) + '%'; }
+    if (zP) { zP.style.left = ((cfg.pC - cfg.pW / 2) * 100) + '%'; zP.style.width = (cfg.pW * 100) + '%'; }
     const nA = document.getElementById('nA'), nP = document.getElementById('nP');
     document.getElementById('gA')?.classList.remove('done'); document.getElementById('gP')?.classList.remove('done');
     document.getElementById('gauges')?.classList.remove('hide');
@@ -1325,8 +1331,8 @@ ${info}` },
     if (nP) nP.style.left = '0%';
     const loop = now => {
       if (!skip) return;
-      if (skip.phase === 'angle') { skip.angle = tri(now - skip.t0, 1600) * 45; if (nA) nA.style.left = (skip.angle / 45 * 100) + '%'; }
-      if (skip.phase === 'charge') { skip.power = tri(now - skip.t0, 1400); if (nP) nP.style.left = (skip.power * 100) + '%'; }
+      if (skip.phase === 'angle') { skip.angle = tri(now - skip.t0, skip.cfg.aP) * 45; if (nA) nA.style.left = (skip.angle / 45 * 100) + '%'; }
+      if (skip.phase === 'charge') { skip.power = tri(now - skip.t0, skip.cfg.pP); if (nP) nP.style.left = (skip.power * 100) + '%'; }
       if (skip.phase === 'angle' || skip.phase === 'charge' || skip.phase === 'power') skip.raf = requestAnimationFrame(loop);
     };
     skip.raf = requestAnimationFrame(loop);
@@ -1347,7 +1353,7 @@ ${info}` },
       const a = document.getElementById('skipact'); if (a) a.className = 'act reel holding';
       cancelAnimationFrame(skip.raf);
       const nP = document.getElementById('nP');
-      const loop = now => { if (skip?.phase !== 'charge') return; skip.power = tri(now - skip.t0, 1400); if (nP) nP.style.left = (skip.power * 100) + '%'; skip.raf = requestAnimationFrame(loop); };
+      const loop = now => { if (skip?.phase !== 'charge') return; skip.power = tri(now - skip.t0, skip.cfg.pP); if (nP) nP.style.left = (skip.power * 100) + '%'; skip.raf = requestAnimationFrame(loop); };
       skip.raf = requestAnimationFrame(loop);
       return;
     }
@@ -1360,16 +1366,20 @@ ${info}` },
     document.getElementById('gP')?.classList.add('done');
     document.getElementById('gauges')?.classList.add('hide');
     const a = document.getElementById('skipact'); if (a) { a.textContent = '날아가는 중'; a.className = 'act off'; }
-    throwStone(skip.angle, skip.power);
+    throwStone(skip.angle, skip.power, skip.cfg);
   }
-  function skipCountFor(angle, power) {
-    if (angle > 40) return 0;                                   // 너무 세워 던지면 퐁당
-    const af = Math.max(0, 1 - Math.abs(angle - 20) / 22);      // 20°에서 1
-    const n = Math.round(power * af * 14 + (Math.random() * 2 - 1));
-    return Math.max(0, Math.min(16, n));
+  // 초록 칸 안이면 1, 벗어난 만큼 줄어든다
+  const skipFit = (v, c, w, fall) => Math.max(0, 1 - Math.max(0, Math.abs(v - c) - w / 2) / fall);
+  function skipCountFor(angle, power, cfg) {
+    if (angle > 40) return { n: 0, q: 0 };                      // 너무 세워 던지면 퐁당
+    const af = skipFit(angle, cfg.aC, cfg.aW, 12), pf = skipFit(power, cfg.pC, cfg.pW, .35);
+    const q = af * pf;
+    const n = Math.round(q * 14 + (Math.random() * 2 - 1));
+    return { n: Math.max(0, Math.min(16, n)), q };
   }
-  function throwStone(angle, power) {
-    const n = skipCountFor(angle, power);
+  function throwStone(angle, power0, cfg) {
+    const { n, q } = skipCountFor(angle, power0, cfg);
+    const power = Math.max(.3, q);                              // 연출용 세기: 잘 맞을수록 멀리, 높이
     const box = document.getElementById('skipbox'), stone = document.getElementById('stone'), cnt = document.getElementById('skipcount');
     if (!box || !stone) return;
     const W = box.clientWidth, H = box.clientHeight;
@@ -2282,7 +2292,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.2.2 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v1.2.3 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
