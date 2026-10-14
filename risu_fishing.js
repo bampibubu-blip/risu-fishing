@@ -40,6 +40,23 @@
   const REROLL_COST = 80;          // % (나머지 99%는 위 가중치대로)
   const GOLDEN_RATE = 1 / 256;
   const START_BAIT = 5;
+  // 업데이트 안내: 버전을 올릴 때 맨 위에 항목을 추가한다 (//@version과 VERSION도 같이 바꾼다)
+  const VERSION = '1.2.3';
+  const CHANGELOG = [
+    ['1.2.3', [
+      '물수제비가 더 어려워졌어요. 던질 때마다 초록 칸의 위치와 너비, 바늘 속도가 바뀌어요.',
+      '업데이트 후 처음 열면 이렇게 바뀐 점을 알려드려요.',
+    ]],
+    ['1.2.2', [
+      '쉼터 탭이 생겼어요. 답변을 기다리며 물수제비와 헤엄치기를 할 수 있어요.',
+      '낚시터를 열어둔 채 답변이 오면 화면 위에 알려드려요.',
+      '상점에 먹이통이 생겼어요. 수조에서 켜고 빈 물을 누르면 먹이를 줘요.',
+      '어두운 테마를 설정 탭에서 켜고 끌 수 있어요.',
+      '미끼가 메인 답변 1회에 5개, 보조 모델 응답 1회에 3개로 늘었어요.',
+      '달성하기 어려운 업적 3개를 새 업적으로 바꿨어요. 이미 받은 칭호는 그대로예요.',
+    ]],
+  ];
+  const verNum = v => String(v || '0').split('.').reduce((a, x) => a * 1000 + (+x || 0), 0);
   // 지역당 배열 순서: 일반 6, 고급 4, 희귀 3, 전설 2
   const TIER_OF_INDEX = [0,0,0,0,0,0,1,1,1,1,2,2,2,3,3];
 
@@ -314,6 +331,7 @@
     swim: { best: 0, plays: 0, day: '', dayShells: 0, pick: null }, // 헤엄치기 기록, pick: 고른 물고기의 t
     fed: 0,         // 먹이 준 횟수
     createdAt: Date.now(),
+    seenVersion: null, // 마지막으로 업데이트 안내를 본 버전
   });
 
 
@@ -1055,6 +1073,13 @@ ${info}` },
     .fishcard .nm{font-size:15px;font-weight:600}
     .fishcard .ds{font-size:13px;color:var(--muted)}
     .fishcard .acts{display:flex;align-items:center;gap:10px;margin-top:8px}
+    .news{position:absolute;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--backdrop)}
+    .news .inner{width:100%;max-height:100%;overflow:auto;background:var(--card);border-radius:10px;padding:18px 18px 16px;box-shadow:0 6px 24px var(--shadow);animation:lift .2s ease-out}
+    .news .nm{font-size:17px;font-weight:700;margin-bottom:4px}
+    .news h4{font-size:13px;color:var(--muted);font-weight:600;margin:12px 0 4px}
+    .news ul{padding-left:18px;font-size:14px;line-height:1.55}
+    .news li+li{margin-top:4px}
+    .news .btn{display:block;width:100%;margin:16px 0 0;padding:11px}
     .arrive{display:flex;align-items:center;gap:8px;margin:10px 16px 0;padding:9px 10px 9px 12px;border-radius:8px;background:var(--pri);color:var(--on-pri);font-size:14px;animation:lift .2s ease-out}
     .arrive span{flex:1}
     .arrive button{background:none;border:1px solid currentColor;border-radius:6px;padding:4px 10px;font-size:13px;cursor:pointer;color:inherit}
@@ -1126,6 +1151,7 @@ ${info}` },
       <nav>${[['fish','낚시'],['play','쉼터'],['tank','수조'],['dex','도감'],['shop','상점'],['ach','업적']].map(([k,l]) => `<button data-tab="${k}" class="${tab===k?'on':''}">${l}</button>`).join('')}</nav>
       <div id="arrive"></div><main id="main"></main><div class="toasts" id="toasts"></div></div>`;
     paintArrive();
+    if (newsOpen) paintNews();
     document.getElementById('close').onclick = close;
     document.getElementById('toset').onclick = () => { if (fishing) cancelFishing(); resolvePending(); tab = 'set'; render(); };
     app.querySelector('nav').style.gap = '16px';
@@ -1140,6 +1166,21 @@ ${info}` },
     else renderSettings(main);
     const onReg = main.querySelector('.regions button.on');
     if (onReg) onReg.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
+
+  // ── 업데이트 안내 팝업
+  let newsOpen = false;
+  function paintNews() {
+    const panel = app.querySelector('.panel'); if (!panel) return;
+    const items = CHANGELOG.filter(([v]) => v === VERSION); // 이번 버전 내용만 보여준다
+    if (!items.length) { newsOpen = false; return; }
+    const el = document.createElement('div'); el.className = 'news';
+    el.innerHTML = `<div class="inner" role="dialog" aria-label="업데이트 안내">
+      <div class="nm">리스 낚시터가 업데이트됐어요</div>
+      ${items.map(([v, list]) => `<h4>v${v}</h4><ul>${list.map(t => `<li>${esc(t)}</li>`).join('')}</ul>`).join('')}
+      <button class="btn pri" id="newsok">확인</button></div>`;
+    panel.appendChild(el);
+    document.getElementById('newsok').onclick = () => { newsOpen = false; state.seenVersion = VERSION; save(); el.remove(); };
   }
 
   // ── 답변 도착 알림: 출력을 기다리며 놀다가 답변이 오면 위에 띠를 띄운다
@@ -2254,6 +2295,11 @@ ${info}` },
     spot = await currentSpot();
     dexRegion = spot.regionId; dexDetail = null;
     visible = true; arrived = false;
+    // 처음 설치한 사람에게는 안내하지 않고 현재 버전으로 표시만 해 둔다
+    if (state.seenVersion !== VERSION) {
+      const fresh = !state.seenVersion && !state.counters.casts && !state.counters.main;
+      if (fresh) { state.seenVersion = VERSION; save(); } else newsOpen = true;
+    }
     render();
     await Risuai.showContainer('fullscreen');
     if (state.unseen.length) {
@@ -2292,7 +2338,7 @@ ${info}` },
 
   checkAch();
   if (state.unseen.length) updateBadge();
-  console.log(`[낚시터] v1.2.3 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
+  console.log(`[낚시터] v${VERSION} 로드 · 미끼 ${state.bait} · 도감 ${Object.keys(state.dex).length}/${TOTAL_SPECIES}`);
 
   // 집계 훅은 맨 마지막에, 기다리지 않고 등록
   (async () => {
