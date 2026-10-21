@@ -1,6 +1,6 @@
 //@name risu_fishing
 //@api 3.0
-//@version 1.2.3
+//@version 1.2.4
 //@update-url https://raw.githubusercontent.com/bampibubu-blip/risu-fishing/main/risu_fishing.js
 //@display-name 🎣 리스 낚시터
 //@link https://github.com/bampibubu-blip/risu-fishing 사용법과 업데이트
@@ -8,7 +8,7 @@
 //@arg image_base string 물고기 그림 폴더 주소. 비워 두면 기본 그림, none을 넣으면 이모지만 써요.
 
 /*
- * 리스 낚시터 v1.2.3 — RisuAI 플러그인 (API v3)
+ * 리스 낚시터 v1.2.4 — RisuAI 플러그인 (API v3)
  *
  * AI 답변(메인·보조 모델)을 받을 때마다 미끼가 쌓이고, 채팅 메뉴의 🎣 버튼으로
  * 지금 대화 중인 캐릭터의 세계관에 맞는 낚시터에서 물고기를 낚는다.
@@ -41,8 +41,14 @@
   const GOLDEN_RATE = 1 / 256;
   const START_BAIT = 5;
   // 업데이트 안내: 버전을 올릴 때 맨 위에 항목을 추가한다 (//@version과 VERSION도 같이 바꾼다)
-  const VERSION = '1.2.3';
+  const VERSION = '1.2.4';
   const CHANGELOG = [
+    ['1.2.4', [
+      '바뀐 RisuAI 저장 방식에 맞췄어요. 기록을 제대로 읽지 못하면 저장하지 않아서, 기록이 덮어써지지 않아요.',
+      '기록을 읽지 못하는 동안 쌓인 미끼는 기록이 돌아오면 합쳐 드려요.',
+      '고유종 그림을 따로 저장해서 저장이 가벼워졌어요. 백업 파일에도 그림이 함께 들어가요.',
+      '여러 기기에서 쓴다면 모든 기기에서 업데이트해 주세요.',
+    ]],
     ['1.2.3', [
       '물수제비가 더 어려워졌어요. 던질 때마다 초록 칸의 위치와 너비, 바늘 속도가 바뀌어요.',
       '업데이트 후 처음 열면 이렇게 바뀐 점을 알려드려요.',
@@ -335,11 +341,48 @@
   });
 
 
+  // ── 저장소 (RisuAI 2026.10 이후: 인덱스 + 콜드 스토리지)
+  // - 읽기에 실패했거나, 키는 있는데 값이 비어 온 경우엔 절대 덮어쓰지 않는다 (기록이 날아가는 걸 막는다)
+  // - 쓰기는 한 번에 하나씩, 마지막 상태가 마지막에 저장되도록 순서를 지킨다
+  // - 고유종 그림은 큰 값이라 본 기록과 따로 '<imgKey>' 키에 둔다
   let state = defaultState();
-  try {
+  let storageOk = false;          // 저장된 기록을 확실히 읽었을 때만 true. false면 쓰지 않는다
+  let bootBase = null;            // 못 읽은 채 시작했을 때의 출발점 (나중에 합칠 때 쓴다)
+  const parseStored = raw => typeof raw === 'string' ? JSON.parse(raw) : raw;
+  async function readStored() {
     const raw = await Risuai.pluginStorage.getItem(STORAGE_KEY);
-    if (raw) state = mergeState(JSON.parse(raw));
-  } catch (e) { console.log('[낚시터] 상태 불러오기 실패: ' + e.message); }
+    const data = raw === null || raw === undefined || raw === '' ? null : parseStored(raw);
+    if (data && typeof data === 'object') return data;
+    // 값이 비었는데 키 목록에는 있다 → 옮기는 중이거나 일시적인 실패. 새 사용자로 보면 안 된다
+    let keys = [];
+    try { keys = (await Risuai.pluginStorage.keys()) || []; } catch (_) { throw new Error('저장소 키 목록을 읽지 못했어요'); }
+    if (keys.includes(STORAGE_KEY)) throw new Error('저장된 기록이 아직 준비되지 않았어요');
+    return null; // 정말 처음
+  }
+  try {
+    const data = await readStored();
+    if (data) state = mergeState(data);
+    storageOk = true;
+  } catch (e) {
+    console.log('[낚시터] 상태 불러오기 실패, 다시 읽을 때까지 저장하지 않아요: ' + (e?.message || e));
+    bootBase = JSON.parse(JSON.stringify(state));
+  }
+  // 못 읽은 채 시작했다가 나중에 읽히면: 저장된 기록을 기준으로, 그사이 쌓인 미끼와 집계만 더한다
+  const DELTA_KEYS = ['main', 'mainNight', 'translate', 'memory', 'emotion', 'otherAx', 'submodel'];
+  async function resync() {
+    if (storageOk) return true;
+    let data;
+    try { data = await readStored(); } catch (e) { console.log('[낚시터] 아직 기록을 읽지 못했어요: ' + (e?.message || e)); return false; }
+    if (data) {
+      const merged = mergeState(data), base = bootBase || defaultState();
+      merged.bait += Math.max(0, state.bait - base.bait);
+      for (const k of DELTA_KEYS) merged.counters[k] = (merged.counters[k] || 0) + Math.max(0, (state.counters[k] || 0) - (base.counters[k] || 0));
+      state = merged;
+    }
+    storageOk = true; bootBase = null;
+    loadSigImgs();
+    return true;
+  }
 
   function mergeState(s) {
     const d = defaultState();
@@ -365,14 +408,66 @@
     };
   }
 
-  let saveTimer = null;
+  let saveTimer = null, writing = null, dirty = false;
   function save() {
+    dirty = true;
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(async () => {
-      try { await Risuai.pluginStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-      catch (e) { console.log('[낚시터] 저장 실패: ' + e.message); }
-    }, 400);
+    saveTimer = setTimeout(() => { flush(); }, 400);
   }
+  // 쓰기는 한 번에 하나씩. 쓰는 동안 또 바뀌면 끝난 뒤 최신 상태로 한 번 더 쓴다
+  async function flush() {
+    clearTimeout(saveTimer);
+    if (!dirty) return;
+    if (!storageOk && !await resync()) { saveTimer = setTimeout(() => { flush(); }, 5000); return; }
+    while (writing) await writing.catch(() => {});
+    if (!dirty) return;
+    writing = (async () => {
+      while (dirty) {
+        dirty = false;
+        // 이 순간의 상태를 문자열로 고정해서 쓴다 (예전 버전과 호환되도록 문자열 그대로)
+        const snap = JSON.stringify(state);
+        try { await Risuai.pluginStorage.setItem(STORAGE_KEY, snap); }
+        catch (e) { dirty = true; console.log('[낚시터] 저장 실패, 잠시 후 다시 시도해요: ' + (e?.message || e)); saveTimer = setTimeout(() => { flush(); }, 5000); break; }
+      }
+    })();
+    try { await writing; } finally { writing = null; }
+  }
+
+  // ── 고유종 그림: 따로 저장하고 메모리에 들고 있는다
+  const sigImgs = {}; // imgKey -> data URL
+  const newImgKey = () => 'sigimg_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  async function loadSigImgs() {
+    if (!storageOk) return;
+    // 예전 버전처럼 기록 안에 그림이 들어 있으면 따로 옮긴다 (옮기기에 성공한 뒤에만 기록에서 뺀다)
+    for (const sg of Object.values(state.sigs)) {
+      if (!sg?.img) continue;
+      const key = sg.imgKey || newImgKey();
+      try { await Risuai.pluginStorage.setItem(key, sg.img); sigImgs[key] = sg.img; sg.imgKey = key; delete sg.img; save(); }
+      catch (e) { console.log('[낚시터] 고유종 그림 옮기기 실패: ' + (e?.message || e)); }
+    }
+    const keys = [...new Set(Object.values(state.sigs).map(sg => sg?.imgKey).filter(k => k && !sigImgs[k]))];
+    await Promise.all(keys.map(async k => {
+      try { const v = await Risuai.pluginStorage.getItem(k); if (typeof v === 'string' && v.startsWith('data:')) sigImgs[k] = v; }
+      catch (_) {}
+    }));
+    if (keys.length && visible) render();
+  }
+  const sigImgOf = sg => (sg?.imgKey && sigImgs[sg.imgKey]) || sg?.img || null;
+  async function setSigImg(sg, url) {
+    const key = sg.imgKey || newImgKey();
+    await Risuai.pluginStorage.setItem(key, url);
+    sigImgs[key] = url; sg.imgKey = key; delete sg.img; save();
+  }
+  function clearSigImg(sg) {
+    const key = sg.imgKey;
+    delete sg.imgKey; delete sg.img; delete sg.flip; save();
+    // 보관된 이전 고유종이 같은 그림을 쓰고 있으면 남겨 둔다
+    if (key && !Object.values(state.sigs).some(x => x?.imgKey === key)) {
+      delete sigImgs[key];
+      Risuai.pluginStorage.removeItem(key).catch(() => {});
+    }
+  }
+  loadSigImgs();
 
   // ─────────────────────────────── 업적 ───────────────────────────────
   let visible = false;
@@ -630,6 +725,7 @@
       if (!sg) return alert('새 고유종을 만들지 못했어요. 다시 만들기권은 그대로 있어요.');
       const archKey = `${id}~${Date.now()}`, oldDex = state.sigDex['sig:' + id];
       if (oldDex) { state.sigs[archKey] = { ...old, archived: true }; state.sigDex['sig:' + archKey] = oldDex; delete state.sigDex['sig:' + id]; }
+      else if (old.imgKey) { const k = old.imgKey; state.sigs[id] = { ...old, imgKey: undefined }; if (!Object.values(state.sigs).some(x => x?.imgKey === k)) { delete sigImgs[k]; Risuai.pluginStorage.removeItem(k).catch(() => {}); } }
       state.tank.forEach(it => { if (it.k === 'sig:' + id) it.k = 'sig:' + archKey; });
       state.sigs[id] = { ...sg, stage: old.stage || 1, charId, charName: char.name || old.charName, region: state.regions[charId]?.r || old.region, at: Date.now() };
       state.gear.rerolls -= 1;
@@ -760,7 +856,8 @@ ${info}` },
   function artSrc(key) {
     if (key && key.startsWith('sig:')) {
       const sg = state.sigs[key.slice(4)];
-      return sg?.img ? { src: sg.img, flip: !!sg.flip } : null;
+      const img = sigImgOf(sg);
+      return img ? { src: img, flip: !!sg.flip } : null;
     }
     const file = ART_BASES.length && artFile(key);
     if (!file) return null;
@@ -1770,7 +1867,7 @@ ${info}` },
         <div class="ds">아직 못 낚았어요. 던질 때마다 ${Math.round(SIG_STAGES[(sg.stage || 1) - 1].rate * 1000) / 10}% 확률로 걸려요.</div></div></div>`;
       return `<div class="titem"><div class="em ${d.g ? 'gold' : ''}">${art('sig:' + id, sg.emoji)}</div><div class="body"><div class="nm">${esc(sg.name)} <span style="color:${TIERS[3].color};font-size:12px;font-weight:600">${sigLabel(sg.stage)}</span></div>
         <div class="ds">${esc(sg.desc)}<br>최고 기록 ${fmtSize(d.best)}, ${d.n}마리</div>
-        ${isArchived(id) ? '' : `<div class="sigacts"><button class="link" data-sigimg="${esc(id)}">${sg.img ? '그림 바꾸기' : '그림 넣기'}</button>${sg.img ? `<button class="link" data-sigflip="${esc(id)}">좌우 뒤집기</button><button class="link" data-sigclear="${esc(id)}">이모지로</button>` : ''}<button class="link" data-reroll="${esc(id)}">다시 만들기</button></div>`}</div></div>`;
+        ${isArchived(id) ? '' : `<div class="sigacts"><button class="link" data-sigimg="${esc(id)}">${sigImgOf(sg) ? '그림 바꾸기' : '그림 넣기'}</button>${sigImgOf(sg) ? `<button class="link" data-sigflip="${esc(id)}">좌우 뒤집기</button><button class="link" data-sigclear="${esc(id)}">이모지로</button>` : ''}<button class="link" data-reroll="${esc(id)}">다시 만들기</button></div>`}</div></div>`;
     };
     const charBlock = cid => {
       const name = state.sigs[cid]?.charName || state.regions[cid]?.name || (cid === spot.charId ? spot.charName : '') || '이름 없음';
@@ -1798,13 +1895,13 @@ ${info}` },
       const f = picker.files?.[0]; if (!f || !target || !state.sigs[target]) return;
       if (!f.type.startsWith('image/')) return alert('이미지 파일만 넣을 수 있어요.');
       if (f.size > 8 * 1024 * 1024) return alert('8MB보다 작은 이미지를 골라 주세요.');
-      try { state.sigs[target].img = await imageToDataUrl(f); state.sigs[target].flip = false; save(); render(); }
+      try { const sg = state.sigs[target]; await setSigImg(sg, await imageToDataUrl(f)); sg.flip = false; save(); render(); }
       catch (_) { alert('이미지를 읽지 못했어요. 다른 파일로 다시 시도해 주세요.'); }
     };
     main.querySelectorAll('[data-sigflip]').forEach(b => b.onclick = () => { const sg = state.sigs[b.dataset.sigflip]; sg.flip = !sg.flip; save(); render(); });
     main.querySelectorAll('[data-sigclear]').forEach(b => b.onclick = () => {
       if (!confirm('올린 그림을 지우고 이모지로 되돌릴까요?')) return;
-      const sg = state.sigs[b.dataset.sigclear]; delete sg.img; delete sg.flip; save(); render();
+      clearSigImg(state.sigs[b.dataset.sigclear]); render();
     });
   }
 
@@ -2272,14 +2369,23 @@ ${info}` },
         const data = JSON.parse(await f.text());
         if (data?.v !== 1 || typeof data.dex !== 'object') throw new Error('낚시터 백업 파일이 아니에요');
         if (!confirm('지금 기록을 백업 파일 내용으로 덮어쓸까요?')) return;
-        state = mergeState(data); save(); render();
+        if (!storageOk && !await resync()) throw new Error('저장소를 아직 읽지 못했어요. 잠시 후 다시 해 주세요');
+        const imgs = data.sigImgs && typeof data.sigImgs === 'object' ? data.sigImgs : {};
+        delete data.sigImgs;
+        for (const [k, v] of Object.entries(imgs)) {
+          if (typeof v !== 'string' || !v.startsWith('data:')) continue;
+          try { await Risuai.pluginStorage.setItem(k, v); sigImgs[k] = v; } catch (_) {}
+        }
+        state = mergeState(data); save(); await flush(); loadSigImgs(); render();
         alert('불러오기 완료!');
       } catch (e) { alert('불러오기 실패: ' + e.message); }
     };
   }
 
   function exportJson() {
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const imgs = {};
+    for (const sg of Object.values(state.sigs)) if (sg?.imgKey && sigImgs[sg.imgKey]) imgs[sg.imgKey] = sigImgs[sg.imgKey];
+    const blob = new Blob([JSON.stringify({ ...state, sigImgs: imgs }, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     const d = new Date();
     a.href = URL.createObjectURL(blob);
@@ -2291,6 +2397,14 @@ ${info}` },
   // ─────────────────────────────── 열기/닫기 ───────────────────────────────
   async function open(which) {
     await loadArtBase();
+    if (!storageOk && !await resync()) {
+      visible = true;
+      app.innerHTML = `<div class="panel"><header><span class="title">리스 낚시터</span><button class="x" id="close" aria-label="닫기">✕</button></header>
+        <div class="empty">저장된 기록을 아직 불러오지 못했어요. RisuAI가 저장소를 정리하는 중일 수 있어요.<br><br>기록이 덮어써지지 않도록 지금은 열지 않을게요. 잠시 뒤에 다시 열어 주세요.</div></div>`;
+      document.getElementById('close').onclick = close;
+      await Risuai.showContainer('fullscreen');
+      return;
+    }
     tab = which;
     spot = await currentSpot();
     dexRegion = spot.regionId; dexDetail = null;
@@ -2313,8 +2427,7 @@ ${info}` },
     stopSkip(); stopSwim();
     clearFishing();
     resolvePending();
-    clearTimeout(saveTimer);
-    try { await Risuai.pluginStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+    try { await flush(); } catch (_) {}
     await Risuai.hideContainer();
   }
 
@@ -2333,7 +2446,7 @@ ${info}` },
     if (hookState === 'on') {
       try { await Risuai.removeRisuReplacer('afterRequest', onAfterRequest); } catch (_) {}
     }
-    try { await Risuai.pluginStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+    try { dirty = true; await flush(); } catch (_) {}
   }));
 
   checkAch();
