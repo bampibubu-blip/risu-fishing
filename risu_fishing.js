@@ -518,9 +518,11 @@
   const BAIT_AUX = 3;   // 보조 모델 응답 1회당 미끼
   // 'pending' | 'on' | 'off' — 권한 요청은 버튼 등록 뒤에 비동기로 처리 (로딩이 멈추지 않게)
   let hookState = 'pending';
+  let selfCalls = 0; // 낚시터가 직접 부른 보조 모델 호출 수
 
   const onAfterRequest = async (content, type) => {
     try {
+      if (selfCalls > 0) return content; // 낚시터가 고유종을 만들려고 부른 호출
       // 'model'은 메인 채팅. 메인은 채팅 리스너에서 따로 센다.
       if (type && type !== 'model') {
         state.bait += BAIT_AUX;
@@ -762,11 +764,14 @@
 ${info}` },
     ];
     lastSigErr = '';
-    const tries = [{ mode: 'otherAx' }, { mode: 'submodel' }, { mode: 'otherAx', allowPlugins: true }];
+    // 커스텀 플러그인 프로바이더를 보조 모델로 쓰는 경우가 많아 처음부터 허용한다 (낚시터는 프로바이더가 아니라 호출 고리가 생기지 않는다)
+    const tries = [{ mode: 'otherAx', allowPlugins: true }, { mode: 'submodel', allowPlugins: true }];
     for (const t of tries) {
       let res;
+      selfCalls += 1;
       try { res = await Risuai.runLLMModel({ ...t, messages }); }
       catch (e) { lastSigErr = '보조 모델 호출 실패: ' + (e?.message || e); continue; }
+      finally { setTimeout(() => { selfCalls = Math.max(0, selfCalls - 1); }, 0); }
       if (res && res.type === 'fail') { lastSigErr = '보조 모델 오류: ' + String(res.result || '').slice(0, 80); continue; }
       const text = await llmText(res);
       if (!text) { lastSigErr = '보조 모델이 빈 응답을 보냈어요'; continue; }
@@ -1214,6 +1219,12 @@ ${info}` },
     .swpicks button.gold img.art{filter:sepia(1) saturate(3) hue-rotate(-12deg)}
     .skipstats{display:flex;gap:16px;padding:12px 16px 0;font-size:14px;color:var(--muted)}
     .skipstats b{color:var(--ink);font-variant-numeric:tabular-nums}
+    /* 좁은 화면: 글자가 한 자씩 꺾이지 않게 */
+    nav{overflow-x:auto;scrollbar-width:none}
+    nav button,.seg button,.bait,header .link{white-space:nowrap;flex:none}
+    header .title{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tankhead{gap:8px}.tankhead > .spot{flex:1;min-width:0}
+    @media (max-width:360px){nav{gap:12px!important}header{gap:8px}header .title{font-size:16px}.bait{font-size:13px}.seg button{padding:5px 9px}}
     @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
   </style>`;
   document.body.innerHTML = `<div id="app"></div>`;
@@ -1252,7 +1263,7 @@ ${info}` },
     document.getElementById('close').onclick = close;
     document.getElementById('toset').onclick = () => { if (fishing) cancelFishing(); resolvePending(); tab = 'set'; render(); };
     app.querySelector('nav').style.gap = '16px';
-    app.querySelectorAll('nav button').forEach(b => b.onclick = () => { if (fishing) cancelFishing(); resolvePending(); tab = b.dataset.tab; render(); });
+    app.querySelectorAll('nav button').forEach(b => b.onclick = () => { feedMode = false; if (fishing) cancelFishing(); resolvePending(); tab = b.dataset.tab; render(); });
     const main = document.getElementById('main');
     if (tab === 'fish') renderFish(main);
     else if (tab === 'dex') renderDex(main);
